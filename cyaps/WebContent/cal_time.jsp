@@ -81,7 +81,7 @@
 		<div class="row">
 		  <div class="col-md-8 am-u-xx-centered" style="">
 		  <div class="am-g">
-			  <div class="am-u-sm-2"><button type="button" class="am-btn am-btn-secondary am-round" onclick = "add_click()">添加设备</button></div>
+			  <div class="am-u-sm-2"><button type="button" class="am-btn am-btn-secondary am-round" onclick = "add_click()">添加日历时间</button></div>
 			  <div class="am-u-sm-6"><input type="text" id = "search" class="am-form-field am-input-sm col-md-4" placeholder="Search by name" onkeydown="onSearch()"></div>
 		  </div>
 		  <div>
@@ -538,7 +538,7 @@ function delete_cstm(action,type,plant,wrkc,mach,cstm_date,starttime,endtime){
 	                   $('#calws_table tbody').append(
 	                   	'<tr>'+'<td>'+result[i].ID+'</td>'+'<td>'+result[i].WCAL_TYPE+'</td>'+'<td>'+result[i].PLANT+'</td>'+'<td>'+result[i].WRKC+'</td>'+'<td>'+result[i].MACH+'</td>'+'<td>'+result[i].CAL_CODE+'</td>'+'<td>'+result[i].WT_CODE+'</td>'
 	                   	+'<td><a href="#" onclick = "edit_click(\'edit\','+"'"+result[i].ID+"',"+"'"+result[i].WCAL_TYPE+"',"+"'"+result[i].PLANT+"',"+"'"+result[i].WRKC+"',"+"'"+result[i].MACH+"',"+"'"+result[i].CAL_CODE+"'"+',\''+result[i].WT_CODE+'\')">编辑 </a>'
-	                   	+'<td><a href="#" onclick = "cstm_click(\'cstm\','+"'"+result[i].ID+"',"+"'"+result[i].WCAL_TYPE+"',"+"'"+result[i].PLANT+"',"+"'"+result[i].WRKC+"',"+"'"+result[i].MACH+'\')">日历</a>'
+	                   	+'<a href="#" onclick = "cstm_click(\'cstm\','+"'"+result[i].ID+"',"+"'"+result[i].WCAL_TYPE+"',"+"'"+result[i].PLANT+"',"+"'"+result[i].WRKC+"',"+"'"+result[i].MACH+'\')">日历</a>'
 	                   	+'<a href="#" onclick = "delete_click(\'delete\','+"'"+result[i].ID+"'"+')"> 删除</a></td></tr>'
 	                   	
 	                   )}  
@@ -588,7 +588,10 @@ function delete_cstm(action,type,plant,wrkc,mach,cstm_date,starttime,endtime){
 		  document.getElementById("wrkcselid").removeAttribute("selected");
 		  document.getElementById("machselid").setAttribute("selected","true");
 	  }
-	  select_type();
+	  document.getElementById("plantid").disabled = true;
+	  document.getElementById("wrkcid").disabled = true;
+	  document.getElementById("machid").disabled = true;
+	  document.getElementById("select_typeid").disabled = true;
 	  $('#calws_edit').modal('toggle');
   }
 function edit_calws() {  
@@ -624,7 +627,7 @@ function edit_calws() {
                $('#calws_table tbody').append(
                	'<tr>'+'<td>'+result[i].ID+'</td>'+'<td>'+result[i].WCAL_TYPE+'</td>'+'<td>'+result[i].PLANT+'</td>'+'<td>'+result[i].WRKC+'</td>'+'<td>'+result[i].MACH+'</td>'+'<td>'+result[i].CAL_CODE+'</td>'+'<td>'+result[i].WT_CODE+'</td>'
                	+'<td><a href="#" onclick = "edit_click(\'edit\','+"'"+result[i].ID+"',"+"'"+result[i].WCAL_TYPE+"',"+"'"+result[i].PLANT+"',"+"'"+result[i].WRKC+"',"+"'"+result[i].MACH+"',"+"'"+result[i].CAL_CODE+"'"+',\''+result[i].WT_CODE+'\')">编辑 </a>'
-               	+'<td><a href="#" onclick = "cstm_click(\'cstm\','+"'"+result[i].ID+"',"+"'"+result[i].WCAL_TYPE+"',"+"'"+result[i].PLANT+"',"+"'"+result[i].WRKC+"',"+"'"+result[i].MACH+'\')">日历</a>'
+               	+'<a href="#" onclick = "cstm_click(\'cstm\','+"'"+result[i].ID+"',"+"'"+result[i].WCAL_TYPE+"',"+"'"+result[i].PLANT+"',"+"'"+result[i].WRKC+"',"+"'"+result[i].MACH+'\')">日历</a>'
                	+'<a href="#" onclick = "delete_click(\'delete\','+"'"+result[i].ID+"'"+')"> 删除</a></td></tr>'
                	
                )}  
