@@ -146,13 +146,17 @@
     		<div class="am-modal-bd">
       		<form method="post" class="am-form">
       		<div class="am-g am-g-fixed">
-      			<div class="am-u-sm-6">
+      			<div class="am-u-sm-6" id = "type_selectid" style = "display:none">
 				<label>类型</label>
 				<select data-am-selected id="select_typeid" onchange="select_type()">
 				  <option value="P" id="plantselid">Plant</option>
 				  <option value="W" id="wrkcselid">Wrkc</option>
 				  <option value="M" id="machselid" selected>Mach</option>
 				</select>
+				</div>
+				<div class="am-u-sm-6" id = "type_textid">
+				<label>类型</label>
+				<input type="text" id="typeinput_textid" value="" required>
 				</div>
 				<div class="am-u-sm-6">
 				<label>PLANT</label>
@@ -562,18 +566,35 @@ function delete_cstm(action,type,plant,wrkc,mach,cstm_date,starttime,endtime){
 	  document.getElementById("machid").value = "";
 	  document.getElementById("calid").value = "";
 	  document.getElementById("timeid").value = "";
+	  document.getElementById("plantid").disabled = false;
+	  document.getElementById("wrkcid").disabled = false;
+	  document.getElementById("machid").disabled = false;
+	  document.getElementById("type_textid").style.display = "none";
+	  document.getElementById("type_selectid").style.display = "block";
 	  $('#calws_edit').modal('toggle');
 	}
   function edit_click(action,id,type,plant,wrkc,mach,cal_code,wt_code){
 	  wmethod = "edit";
 	  wid = id;
-	  document.getElementById("select_typeid").value = type;
 	  document.getElementById("plantid").value = plant;
 	  document.getElementById("wrkcid").value = wrkc;
 	  document.getElementById("machid").value = mach;
 	  document.getElementById("calid").value = cal_code;
 	  document.getElementById("timeid").value = wt_code;
+	  document.getElementById("plantid").disabled = true;
+	  document.getElementById("wrkcid").disabled = true;
+	  document.getElementById("machid").disabled = true;
+	  document.getElementById("typeinput_textid").disabled = true;
 	  if(type == 'P'){
+		  document.getElementById("typeinput_textid").value = "P";
+	  }
+	  if(type == 'W'){
+		  document.getElementById("typeinput_textid").value = "W";
+	  }
+	  if(type == 'M'){
+		  document.getElementById("typeinput_textid").value = "M";
+	  }
+/*	  if(type == 'P'){
 		  document.getElementById("plantselid").setAttribute("selected","true");
 		  document.getElementById("wrkcselid").removeAttribute("selected");
 		  document.getElementById("machselid").removeAttribute("selected");
@@ -588,10 +609,7 @@ function delete_cstm(action,type,plant,wrkc,mach,cstm_date,starttime,endtime){
 		  document.getElementById("wrkcselid").removeAttribute("selected");
 		  document.getElementById("machselid").setAttribute("selected","true");
 	  }
-	  document.getElementById("plantid").disabled = true;
-	  document.getElementById("wrkcid").disabled = true;
-	  document.getElementById("machid").disabled = true;
-	  document.getElementById("select_typeid").disabled = true;
+**/	  
 	  $('#calws_edit').modal('toggle');
   }
 function edit_calws() {  
