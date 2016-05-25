@@ -1,0 +1,1113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap>
+	<select id="dao-EHeijunka.getShopOrderList" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select
+		A.E1WRKC "WorkCenter",
+		A.E1ORD "ShopOrder",
+		A.E1OP "op",
+		A.E1FAC "plant",
+		rtrim(ltrim(A.E1PROD)) "Item",
+		A.E1RQTY "RequireQuantity",
+		A.E1RHRS "RequireHours",
+		C.AllocatedQuantity,
+		C.AllocatedHours,
+		CASE WHEN
+		C.AllocatedQuantity is null THEN A.E1RQTY ELSE
+		(A.E1RQTY-C.AllocatedQuantity) END "RemainQuantity",
+		CASE WHEN
+		C.AllocatedHours is null THEN A.E1RHRS ELSE
+		(A.E1RHRS-C.AllocatedHours) END "RemainHours",
+		A.E1OSDT "OriginalStartDate",
+		A.E1OSTM "OriginalStartTime",
+		A.E1OEDT "OriginalEndDate",
+		A.E1OETM "OriginalEndTime",
+		A.E1ODDT "OriginalDueDate",
+		A.E1ODTM "OriginalDueTime",
+		A.E1SDTE "StartDate",
+		A.E1STME "StartTime",
+		A.E1DDTE "DueDate",
+		A.E1DTME "DueTime",
+		rtrim(ltrim(B.ITEM_DESC)) "ItemDescription",
+		D.RLSDTE "ReleaseDate"
+		from dta_itm B,erp_sord D,eh0010pf A
+		left outer join
+		(
+		select
+		E2WRKC "WorkCenter",
+		E2ORD "ShopOrder",
+		E2OP "op",
+		E2FAC "plant",
+		sum(E2AQTY) "AllocatedQuantity",
+		sum(E2AHRS)	"AllocatedHours"
+		from eh0020pf
+		where E2ID &lt;&gt; 'EZ'
+		group by E2WRKC,E2ORD,E2OP,E2FAC
+		) C on A.E1WRKC = C.WorkCenter AND A.E1ORD = C.ShopOrder AND A.E1OP=C.op AND A.E1FAC=C.plant
+		WHERE A.E1PROD = B.ITEM AND A.E1WRKC = #workCenter# AND
+		A.E1ORD = D.ORD_NUM AND A.E1FAC=D.PLANT
+		<isNotEmpty prepend=" AND " property="shopOrder">
+			A.E1ORD = #shopOrder# AND A.E1OP=#op#
+		</isNotEmpty>
+	</select>
+
+	<select id="dao-EHeijunka.getUnplannedShopOrderList"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select
+		A.E1WRKC "WorkCenter",
+		A.E1ORD "ShopOrder",
+		A.E1OP "op",
+		A.E1FAC "plant",
+		rtrim(ltrim(A.E1PROD)) "Item",
+		A.E1RQTY "RequireQuantity",
+		A.E1RHRS "RequireHours",
+		C.AllocatedQuantity,
+		C.AllocatedHours,
+		CASE WHEN
+		C.AllocatedQuantity is null THEN A.E1RQTY ELSE
+		(A.E1RQTY-C.AllocatedQuantity) END "RemainQuantity",
+		CASE WHEN
+		C.AllocatedHours is null THEN A.E1RHRS ELSE
+		(A.E1RHRS-C.AllocatedHours) END "RemainHours",
+		cast(A.E1OSDT as bigint)*1000000+A.E1OSTM "OriginalStartDateTime",
+		cast(A.E1OEDT as bigint)*1000000+A.E1OETM "OriginalEndDateTime",
+		cast(A.E1ODDT as bigint)*1000000+A.E1ODTM "OriginalDueDateTime",
+		A.E1SDTE "StartDate",
+		A.E1STME "StartTime",
+		A.E1DDTE "DueDate",
+		A.E1DTME "DueTime",
+		rtrim(ltrim(B.ITEM_DESC)) "ItemDescription",
+		D.RLSDTE "ReleaseDate",
+		A.E1PFSG "SubFamily",
+		A.E1PFMY "Family",
+		D.PRIORITY "Priority",
+		F.E5PDTE "newStartDateP",
+		F.E5PTME "newStartTimeP",
+		rtrim(ltrim(F.E5PSRC)) "sourceP",
+		F.E5PDLY "delayP",
+		F.E5CDTE "newStartDateC",
+		F.E5CTME "newStartTimeC",
+		rtrim(ltrim(F.E5CSRC)) "sourceC",
+		F.E5CDLY "delayC"
+		from dta_itm B,erp_sord D,eh0010pf A
+		left outer join
+		(select
+		E2WRKC "WorkCenter",
+		E2ORD "ShopOrder",
+		E2OP "op",
+		E2FAC "plant",
+		sum(E2AQTY) "AllocatedQuantity",
+		sum(E2AHRS)	"AllocatedHours"
+		from eh0020pf
+		where E2ID &lt;&gt; 'EZ'
+		group by E2WRKC,E2ORD,E2OP,E2FAC) C on A.E1WRKC = C.WorkCenter AND A.E1ORD =C.ShopOrder AND A.E1OP=C.op AND A.E1FAC=C.plant
+		left outer
+		join eh0050pf F on A.E1ORD = F.E5ORD AND A.E1OP=F.E5OP AND A.E1FAC=F.E5FAC
+		WHERE A.E1WRKC=#workCenter#
+		AND A.E1PROD = B.ITEM AND A.E1WRKC in (
+		SELECT DISTINCT E40WRKC FROM
+		eh0040pf
+		WHERE E40MACH in (SELECT E40MACH FROM eh0040pf WHERE E40WRKC =
+		#workCenter#)
+		)
+		AND A.E1ORD = D.ORD_NUM
+		AND (C.AllocatedQuantity is null
+		OR (C.AllocatedQuantity is not null
+		AND
+		(A.E1RQTY-C.AllocatedQuantity) &lt;&gt; 0))
+		AND D.REQ_QTY-D.FIN_QTY>0
+		ORDER BY D.RLSDTE ASC
+	</select>
+
+	<select id="dao-EHeijunka.getMachineCount" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		SELECT
+		decimal(substring(wdesc,length(rtrim(ltrim(wdesc)))-1,2))
+		"machineCount"
+		FROM lwkl01 WHERE wwrkc = #workCenter#
+	</select>
+
+	<select id="dao-EHeijunka.getMachineList" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		SELECT
+		DISTINCT
+		rtrim(ltrim(E40MACH)) "Id",
+		rtrim(ltrim(E40MACH)) "Name"
+		FROM
+		eh0040pf
+		WHERE E40WRKC in (
+		SELECT DISTINCT E40WRKC FROM eh0040pf
+		WHERE
+		E40MACH in (SELECT E40MACH FROM eh0040pf WHERE E40WRKC =
+		#workCenter#)
+		)
+	</select>
+
+	<select id="dao-EHeijunka.getEventList" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select
+		A.E2ROW "EventId",
+		A.E2ID "ID",
+		A.E2WRKC "WorkCenter",
+		A.E2ORD	"ShopOrder",
+        A.E2OP "op",
+        A.E2FAC "plant",
+		rtrim(ltrim(A.E2MAC)) "ResourceId",
+		A.E2AQTY "Quantity",
+		A.E2AHRS "Hours",
+		rtrim(ltrim(A.E2TITLE)) "Title",
+		CASE
+		WHEN D.E1OSTS = 'XX' THEN 'sch-event-gray'
+		WHEN D.E1OSTS &lt;&gt; 'XX' AND cast(A.E2EDTE as bigint)*1000000+A.E2ETME&lt;=convert(bigint,replace(replace(replace(convert(varchar,getdate(),120),'-',''),' ',''),':','')) THEN 'sch-event-green'
+		ELSE rtrim(ltrim(A.E2CLS)) END "Cls",
+		A.E2SDTE "startDate",
+		A.E2STME "startTime",
+		A.E2EDTE "endDate",
+		A.E2ETME "endTime",
+		A.E2TYPE "EventType",
+		A.E2UBY "updatedBy",
+		A.E2UDTE "updatedDate",
+		A.E2UTME "updatedTime",
+		D.E1PROD "Item",
+		D.ITEM_DESC "ItemDescription",
+		D.RLSDTE "ReleaseDate",
+		D.E1DDTE "DueDate",
+		D.E1DTME "DueTime",
+		CASE WHEN A.E2ID = 'FX' THEN 'TRUE' ELSE 'FALSE' END "Fixed",
+		D.E1OSTS "Status",
+		D.E1PFSG "SubFamily",
+		D.E1PFMY "Family",
+		D.PRIORITY "Priority",
+		D.E1OEDT "OriginalEndDate",
+		D.E1OETM "OriginalEndTime",
+		D.E1EDTE "RealEndDate",
+		D.E1ETME "RealEndTime",
+		D.E1REMK "OriginalEndDateTimeRemark",
+		F.E5PDTE "newStartDateP",
+		F.E5PTME "newStartTimeP",
+		rtrim(ltrim(F.E5PSRC)) "sourceP",
+		F.E5PDLY "delayP",
+		F.E5CDTE "newStartDateC",
+		F.E5CTME "newStartTimeC",
+		rtrim(ltrim(F.E5CSRC)) "sourceC",
+		F.E5CDLY "delayC"
+		from eh0020pf A left outer join
+		(select B.E1WRKC,B.E1ORD,B.E1OP,B.E1FAC,B.E1PROD,B.E1DDTE,B.E1DTME,C.ITEM_DESC,E.RLSDTE,B.E1OSTS,B.E1PFSG,B.E1PFMY,E.PRIORITY,B.E1OEDT,B.E1OETM,B.E1EDTE,B.E1ETME,B.E1REMK
+		from eh0010pf B, dta_itm C, erp_sord E
+		where B.E1PROD = C.ITEM AND B.E1ORD =E.ORD_NUM AND E1FAC=E.PLANT ) D on A.E2WRKC = D.E1WRKC AND A.E2ORD = D.E1ORD AND A.E2OP=D.E1OP AND A.E2FAC=D.E1FAC
+		left outer join 
+		eh0050pf F on A.E2ORD = F.E5ORD AND A.E2OP=F.E5OP AND A.E2FAC=F.E5FAC
+		WHERE A.E2ID &lt;&gt; 'EZ' AND A.E2WRKC in (SELECT DISTINCT E40WRKC FROM eh0040pf WHERE E40MACH in (SELECT E40MACH FROM eh0040pf WHERE E40WRKC = #workCenter#)
+		) AND A.E2SDTE > #startDateStr#
+		<isNotEmpty prepend=" AND " property="shopOrder">
+			A.E2ORD = #shopOrder#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="machine">
+			A.E2MAC = #machine#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="id">
+			A.E2ROW = #eventId#
+		</isNotEmpty>
+		ORDER BY A.E2SDTE DESC
+	</select>
+
+	<insert id="dao-EHeijunka.insertEvent" parameterClass="java.util.HashMap">
+		insert
+		into eh0020pf
+		(E2ID,E2WRKC,E2ORD,E2OP,E2MAC,E2AQTY,E2AHRS,E2TITLE,E2SDTE,E2STME,E2EDTE,E2ETME,E2TYPE,E2CLS,E2UBY,E2UDTE,E2UTME,E2FAC)
+		values
+		(#id#,#workCenter#,#shopOrder#,#op#,#machine#,#allocatedQuantity#,#allocatedHours#,#title#,#startDate#,#startTime#,#endDate#,#endTime#,#eventType#,#cls#,#updatedBy#,#updatedDate#,#updatedTime#,#plant#)
+	</insert>
+
+	<update id="dao-EHeijunka.updateEvent" parameterClass="java.util.HashMap">
+		update
+		eh0020pf
+		set E2ID = #id#,E2MAC =
+		#machine#,E2AQTY=#allocatedQuantity#,E2AHRS =
+		#allocatedHours#,E2TITLE
+		= #title#,E2CLS = #cls#,E2SDTE =
+		#startDate#,E2STME =
+		#startTime#,E2EDTE = #endDate#,E2ETME =
+		#endTime#,
+		E2UBY = #updatedBy#,
+		E2UDTE = #updatedDate#, E2UTME =
+		#updatedTime#
+		where E2ROW =
+		#eventId#
+	</update>
+
+	<update id="dao-EHeijunka.deleteEvent" parameterClass="java.util.HashMap">
+		update
+		eh0020pf
+		set E2ID= 'EZ',E2UBY = #updatedBy#, E2UDTE = #updatedDate#,
+		E2UTME =
+		#updatedTime#
+		where E2ROW = #eventId#
+	</update>
+
+	<!--  <update id="dao-EHeijunka.updateShopOrder" parameterClass="java.util.HashMap">
+		update eh0010pf
+		set E1SDTE = #startDate#, E1STME = #startTime#, E1DDTE
+		= #dueDate#,
+		E1DTME = #dueTime#
+		where E1WRKC = #workCenter# AND E1ORD =
+		#shopOrder#
+	</update>  -->
+	<update id="dao-EHeijunka.updateShopOrder" parameterClass="java.util.HashMap">
+		update eh0010pf
+		set e1edte=(select top 1 b.e2edte from eh0020pf b where e1ord=b.e2ord order by cast(b.e2edte as bigint)*1000000+b.e2etme desc),
+    		e1etme=(select top 1 b.e2etme from eh0020pf b where e1ord=b.e2ord order by cast(b.e2edte as bigint)*1000000+b.e2etme desc),
+    		e1sdte=(select top 1 b.e2sdte from eh0020pf b where e1ord=b.e2ord order by cast(b.e2sdte as bigint)*1000000+b.e2stme),
+    		e1stme=(select top 1 b.e2stme from eh0020pf b where e1ord=b.e2ord order by cast(b.e2sdte as bigint)*1000000+b.e2stme)
+		where e1ord = #shopOrder# and e1op=#op#
+	</update>
+	
+	<update id="dao-EHeijunka.updErpSordFromKB" parameterClass="java.util.HashMap">
+		update erp_sord
+		set strdte=(select top 1 b.e1sdte from eh0010pf b where ord_num=substring(b.e1ord,1,14)),
+    		strtme=(select top 1 b.e1stme from eh0010pf b where ord_num=substr(b.e1ord,1,14)),
+    		enddte=(select top 1 b.e1edte from eh0010pf b where ord_num=substr(b.e1ord,1,14)),
+    		endtme=(select top 1 b.e1etme from eh0010pf b where ord_num=substr(b.e1ord,1,14))
+		where ord_num = #shopOrder#
+	</update>
+
+	<select id="dao-EHeijunka.getResourceAvailabilityList"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select
+		E43WRKC
+		"WorkCenter",
+		rtrim(ltrim(E43MACH)) "ResourceId",
+		E43DATE "Date",
+		E43WTFR
+		"StartTime",
+		E43WTTO "EndTime"
+		FROM EH0043PF WHERE E43WRKC =
+		#workCenter#
+	</select>
+
+	<select id="dao-EHeijunka.getUserAccessInfoList" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select
+		E3USRID "UserId",
+		E3WRKC "WorkCenter",
+		E3UFLAG "UseFlag"
+		FROM
+		eh0030pf WHERE 1=1
+		<isNotEmpty prepend=" AND " property="workCenter">
+			E3WRKC in (
+			SELECT
+			DISTINCT E40WRKC FROM eh0040pf
+			WHERE E40MACH in (SELECT E40MACH FROM
+			eh0040pf WHERE E40WRKC =
+			#workCenter#)
+			)
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="userId">
+			UPPER(E3USRID) =
+			upper(#userId#)
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="useFlag">
+			E3UFLAG = #useFlag#
+		</isNotEmpty>
+	</select>
+
+	<update id="dao-EHeijunka.updateUserAccessInfo" parameterClass="java.util.HashMap">
+		update eh0030pf
+		set E3UFLAG = #useFlag#
+		where UPPER(E3USRID) = UPPER(#userId#)
+		AND E3WRKC =
+		#workCenter#
+	</update>
+
+	<select id="dao-EHeijunka.getShopOrderLastEnddatetimeList"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select
+		max(cast(A.E2EDTE as bigint)*1000000+A.E2ETME) "lastEndDateTime",
+		A.E2ORD "shopOrder",
+		A.E2OP "op",
+		A.E2FAC "plant"
+		from eh0020pf A
+		left outer join eh0010pf B on A.E2WRKC = B.E1WRKC AND
+		A.E2ORD = B.E1ORD AND A.E2OP=B.E1OP AND A.E2FAC=B.E1FAC
+		left outer join
+		(
+		select
+		E2WRKC "WorkCenter",
+		E2ORD "ShopOrder",
+		E2OP "op",
+		E2FAC "plant",
+		sum(E2AQTY) "AllocatedQuantity",
+		sum(E2AHRS) "AllocatedHours"
+		from eh0020pf
+		where E2ID &lt;&gt; 'EZ'
+		group by
+		E2WRKC,E2ORD,E2OP,E2FAC
+		) C on A.E2WRKC = C.WorkCenter AND A.E2ORD =C.ShopOrder	AND A.E2OP=C.op	AND A.E2FAC=C.plant
+		WHERE A.E2ID &lt;&gt; 'EZ' AND A.E2ORD &lt;&gt; '0' AND
+		A.E2WRKC in (
+		SELECT DISTINCT E40WRKC FROM eh0040pf
+		WHERE E40MACH in
+		(SELECT E40MACH FROM eh0040pf WHERE E40WRKC =
+		#workCenter#)
+		) AND
+		C.AllocatedQuantity is not null AND (B.E1RQTY-C.AllocatedQuantity) &lt;= 0
+		group by A.E2ORD,A.E2OP,A.E2FAC
+	</select>
+
+
+
+	<insert id="dao-EHeijunka.insertSOByWC" parameterClass="java.util.HashMap">
+		insert
+		into eh0050w5
+		(W5WRKC,W5ORD)
+		values
+		(#workCenter#,#shopOrder#)
+	</insert>
+
+	<delete id="dao-EHeijunka.deleteSOByWC" parameterClass="java.util.HashMap">
+		delete
+		from eh0050w5
+		where W5WRKC = #workCenter#
+	</delete>
+
+	<select id="dao-EHeijunka.getEventCountByShopOrder.count"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select count(*) count
+		FROM eh0020pf WHERE E2ID &lt;&gt; 'EZ' AND E2ORD = #shopOrder# and e2op=#op#
+	</select>
+
+	<update id="dao-EHeijunka.updateShopOrderRemark" parameterClass="java.util.HashMap">
+		update eh0010pf
+		set E1REMK = cast(E1OEDT as bigint)*1000000+E1OETM
+		where E1ORD =
+		#shopOrder#
+	</update>
+
+	<select id="dao-EHeijunka.getAuthList" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select rtrim(ltrim(E3AUFLAG)) "authFlag" from eh0030pf
+		where 1=1
+		<isNotEmpty prepend=" AND " property="workCenter">
+			E3WRKC= #workCenter#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="userId">
+			E3USRID = 'TESTID' <!--  #userId# -->
+		</isNotEmpty>
+		<isEqual prepend=" AND " property="checkAuthControl"
+			compareValue="true">
+			rtrim(ltrim(E3AUFLAG)) &lt;&gt; ''
+		</isEqual>
+	</select>
+	
+	<select id="dao-EHeijunka.checkUserLogin" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select uid,psw from sys_user
+		WHERE upper(uid)= upper(#uid#) AND psw= #psw#
+	</select>
+	
+	<select id="dao-EHeijunka.getDemand"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select id,plant,ord_num,ord_type,item,prnt,org_qty,req_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,
+		rlsdte,rlstme,duedte,duetme,schld,version
+		FROM tmp_demand WHERE req_qty &lt;&gt; 0 AND plant= #plant# AND item=#item#
+		order by org_rlsdte,org_rlstme,org_duedte,org_duetme,ord_type,item
+	</select>
+	
+	<select id="dao-EHeijunka.getSupply"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select id,plant,ord_num,ord_type,item,rem_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,
+		rlsdte,rlstme,duedte,duetme,schld,version
+		FROM tmp_supply WHERE rem_qty &lt;&gt; 0 AND plant= #plant# AND item=#item#
+		order by ord_type,duedte,duetme,item
+	</select>
+	
+	<select id="dao-EHeijunka.getSupplyItemList"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select distinct plant,item from tmp_itemlist
+		where plant= #plant#
+		order by item
+	</select>
+
+	<update id="dao-EHeijunka.updSupply" parameterClass="java.util.HashMap">
+		update tmp_supply
+		set rem_qty = #remainQty#
+		where id = #idSupply#
+	</update>
+
+	<update id="dao-EHeijunka.updDemand" parameterClass="java.util.HashMap">
+		update tmp_demand
+		set req_qty = #reqQty#, rlsdte=#rlsdte#, rlstme=#rlstme#, duedte=#duedte#, duetme=#duetme#, chld_ord=#chld_ord#, chld_ordtype=#chld_ordtype# 
+		where id = #idDemand#
+	</update>
+
+	<insert id="dao-EHeijunka.savAllocLog" parameterClass="java.util.HashMap">
+		insert into peg_alloc_log
+			(dem_plant,dem_ord_type,dem_ord_num,dem_item,dem_org_qty,dem_req_qty,dem_org_rlsdte,dem_org_rlstme,dem_org_duedte,dem_org_duetme,
+			dem_rlsdte,dem_rlstme,dem_duedte,dem_duetme,dem_schld,dem_peg_lvl,
+			sup_plant,sup_ord_type,sup_ord_num,sup_item,sup_alc_qty,sup_rem_qty,sup_org_rlsdte,sup_org_rlstme,sup_org_duedte,sup_org_duetme,
+			sup_rlsdte,sup_rlstme,sup_duedte,sup_duetme,sup_schld,version)
+		values
+			(#dem_plant#,#dem_ord_type#,#dem_ord_num#,#dem_item#,#dem_org_qty#,#dem_req_qty#,#dem_org_rlsdte#,#dem_org_rlstme#,#dem_org_duedte#,#dem_org_duetme#,
+			#dem_rlsdte#,#dem_rlstme#,#dem_duedte#,#dem_duetme#,#dem_schld#,#dem_peg_lvl#,
+			#sup_plant#,#sup_ord_type#,#sup_ord_num#,#sup_item#,#sup_alc_qty#,#sup_rem_qty#,#sup_org_rlsdte#,#sup_org_rlstme#,#sup_org_duedte#,#sup_org_duetme#,
+			#sup_rlsdte#,#sup_rlstme#,#sup_duedte#,#sup_duetme#,#sup_schld#,#version#)
+	</insert>
+	
+	<select id="dao-EHeijunka.getLTFromItm"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select lead_time 
+		from dta_itm 
+		where item=#item#
+	</select>
+		
+	<select id="dao-EHeijunka.getLTFromRtn"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select case when const_hrs=0 then run_hrs+mov_hrs+insp_hrs+queue_hrs else const_hrs end as lead_time 
+		from dta_rtn 
+		where plant= #plant# AND item=#item# and meth='DF' and op=10
+	</select>
+	
+	<delete id="dao-EHeijunka.delTmpDmd" parameterClass="java.util.HashMap">
+		delete from tmp_demand where plant=#plant#
+	</delete>
+	
+	<delete id="dao-EHeijunka.delTmpSup" parameterClass="java.util.HashMap">
+		delete from tmp_supply where plant=#plant#
+	</delete>
+
+	<delete id="dao-EHeijunka.delTmpItemList" parameterClass="java.util.HashMap">
+		delete from tmp_itemlist where plant=#plant#
+	</delete>
+
+	<insert id="dao-EHeijunka.insTmpItemListFromDmd" parameterClass="java.util.HashMap">
+		insert into tmp_itemlist 
+		select distinct plant,item from tmp_demand where plant = #plant#
+	</insert>
+	
+	<insert id="dao-EHeijunka.insTmpItemListFromSup" parameterClass="java.util.HashMap">
+		insert into tmp_itemlist 
+		select distinct plant,item from tmp_supply where plant = #plant#
+	</insert>
+	
+	<insert id="dao-EHeijunka.insDmdSORM" parameterClass="java.util.HashMap">
+		insert into tmp_demand (plant,ord_type,ord_num,item,prnt,org_qty,req_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,rlsdte,rlstme,duedte,duetme,schld,chld_ordtype,chld_ord,version)
+		select plant,ord_type,ord_num,item,prnt,req_qty,req_qty,rlsdte,rlstme,duedte,duetme,99999999,999999,99999999,999999,'','','',#version# from erp_sord_dtl
+		where plant = #plant# and item in (select item from dta_itm where m_type='RM')
+	</insert>					
+	
+	<insert id="dao-EHeijunka.insDmdSOSFG" parameterClass="java.util.HashMap">
+		insert into tmp_demand (plant,ord_type,ord_num,item,prnt,org_qty,req_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,rlsdte,rlstme,duedte,duetme,schld,chld_ordtype,chld_ord,version)
+		select plant,ord_type,ord_num,item,prnt,req_qty,req_qty,rlsdte,rlstme,duedte,duetme,99999999,999999,99999999,999999,'','','',#version# from erp_sord_dtl
+		where plant = #plant# 
+		and item in (select item from dta_itm where m_type='SF')
+		and item not in (select item from erp_sord)
+		and item not in (select item from erp_plnord)
+		and item in (select item from erp_inv where avai_qty>0) 
+	</insert>	
+	
+	<insert id="dao-EHeijunka.insDmdSO" parameterClass="java.util.HashMap">
+		insert into tmp_demand (plant,ord_type,ord_num,item,prnt,org_qty,req_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,rlsdte,rlstme,duedte,duetme,schld,chld_ordtype,chld_ord,version)
+		select plant,ord_type,ord_num,item,prnt,req_qty,req_qty,rlsdte,rlstme,duedte,duetme,99999999,999999,99999999,999999,'','','',#version# from erp_sord_dtl
+		where plant = #plant# and item in (select item from tmp_itemlist) 
+	</insert>	
+	
+	<insert id="dao-EHeijunka.insDmdPlnOrdRM" parameterClass="java.util.HashMap">
+		insert into tmp_demand (plant,ord_type,ord_num,item,prnt,org_qty,req_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,rlsdte,rlstme,duedte,duetme,schld,chld_ordtype,chld_ord,version)
+		select plant,ord_type,ord_num,item,prnt,req_qty,req_qty,rlsdte,rlstme,duedte,duetme,99999999,999999,99999999,999999,'','','',#version# from erp_plnord_dtl
+		where plant = #plant# and item in (select item from dta_itm where m_type='RM') 
+	</insert>
+	
+	<insert id="dao-EHeijunka.insDmdPlnOrd" parameterClass="java.util.HashMap">
+		insert into tmp_demand (plant,ord_type,ord_num,item,prnt,org_qty,req_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,rlsdte,rlstme,duedte,duetme,schld,chld_ordtype,chld_ord,version)
+		select plant,ord_type,ord_num,item,prnt,req_qty,req_qty,rlsdte,rlstme,duedte,duetme,99999999,999999,99999999,999999,'','','',#version# from erp_plnord_dtl
+		where plant = #plant# and item in (select item from tmp_itemlist) 
+	</insert>
+	
+	<insert id="dao-EHeijunka.insSupOH" parameterClass="java.util.HashMap">
+		insert into tmp_supply (plant,ord_type,ord_num,item,org_qty,rem_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,rlsdte,rlstme,duedte,duetme,schld,version)
+		select plant,ord_type,ord_num,item,avai_qty,avai_qty,convert(int,convert(varchar(8),getdate(),112)),0,convert(int,convert(varchar(8),getdate(),112)),0,convert(int,convert(varchar(8),getdate(),112)),0,convert(int,convert(varchar(8),getdate(),112)),0,'',#version# from erp_inv
+		where plant = #plant# and item in (select item from tmp_itemlist)
+	</insert>
+								
+	<insert id="dao-EHeijunka.insSupPO" parameterClass="java.util.HashMap">
+		insert into tmp_supply (plant,ord_type,ord_num,item,org_qty,rem_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,rlsdte,rlstme,duedte,duetme,schld,version)
+		select plant,ord_type,ord_num,item,pur_qty-rcv_qty,pur_qty-rcv_qty,rlsdte,rlstme,duedte,duetme,rlsdte,rlstme,duedte,duetme,'',#version# from erp_hpo 
+		where plant = #plant# and item in (select item from tmp_itemlist)
+	</insert>
+	
+	<insert id="dao-EHeijunka.insSupSO" parameterClass="java.util.HashMap">
+		insert into tmp_supply (plant,ord_type,ord_num,item,org_qty,rem_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,rlsdte,rlstme,duedte,duetme,schld,version)
+		select plant,ord_type,ord_num,item,req_qty-fin_qty,req_qty-fin_qty,rlsdte,rlstme,duedte,duetme,rlsdte,rlstme,duedte,duetme,'',#version# from erp_sord 
+		where plant = #plant# and item in (select item from tmp_itemlist)
+	</insert>
+	
+	<insert id="dao-EHeijunka.insSupPL" parameterClass="java.util.HashMap">
+		insert into tmp_supply (plant,ord_type,ord_num,item,org_qty,rem_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,rlsdte,rlstme,duedte,duetme,schld,version)
+		select plant,ord_type,ord_num,item,req_qty,req_qty,rlsdte,rlstme,duedte,duetme,rlsdte,rlstme,duedte,duetme,'',#version# from erp_plnord 
+		where plant = #plant# and item in (select item from tmp_itemlist)
+	</insert>								
+
+	<insert id="dao-EHeijunka.insSupFromTmpDmd" parameterClass="java.util.HashMap">
+		insert into tmp_supply (plant,ord_type,ord_num,item,org_qty,rem_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,rlsdte,rlstme,duedte,duetme,schld,version)
+		select a.plant,a.ord_type,a.ord_num,a.prnt,isnull(b.req_qty-b.fin_qty,0),isnull(b.req_qty-b.fin_qty,0),isnull(b.rlsdte,0),isnull(b.rlstme,0),isnull(b.duedte,0),isnull(b.duetme,0),0,0,left(duedt,8),right(duedt,6),'',#version#
+		from (select plant,ord_type,ord_num,prnt,max(cast(duedte as bigint)*1000000+duetme) as duedt from tmp_demand group by plant,ord_type,ord_num,prnt) a 
+		left join erp_sord b on a.plant=b.plant and a.ord_type=b.ord_type and a.ord_num=b.ord_num and a.prnt=b.item
+		where a.plant=#plant# and a.prnt not in (select item from dta_itm where m_type='FG')
+	</insert>
+	
+	<!-- 
+	<delete id="dao-EHeijunka.delTmpOrdDtl" parameterClass="java.util.HashMap">
+		delete from tmp_ord_dtl
+	</delete>
+	
+	<insert id="dao-EHeijunka.insTmpOrdDtl" parameterClass="java.util.HashMap">
+		insert into tmp_ord_dtl
+        select * from 
+        (select (@row_number := case when @ordernumber = ord_num then @row_number + 1 else 1 end) as rowid,
+		    @ordernumber := ord_num as ord_num,plant,ord_type,prnt,rlsdte,rlstme,duedte,duetme,chld_ordtype,chld_ord,version
+		from peg_ord_dtl 
+		where plant=#plant# and version=#version#
+		order by ord_num,duedte*1000000+duetme desc,item) a
+        where rowid=1
+	</insert>
+	 -->	
+	<insert id="dao-EHeijunka.insPegOrd" parameterClass="java.util.HashMap">
+		insert into peg_ord (plant,ord_type,ord_num,item,wrkc,req_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,rlsdte,rlstme,duedte,duetme,chld_ordtype,chld_ord,version)
+		select a.plant,a.ord_type,a.ord_num,a.prnt,isnull(b.wrkc,0),isnull(b.req_qty,0),isnull(b.rlsdte,0),isnull(b.rlstme,0),isnull(b.duedte,0),isnull(b.duetme,0),a.rlsdte,a.rlstme,a.duedte,a.duetme,a.chld_ordtype,a.chld_ord,a.version  
+		from (select top 1 plant,ord_type,ord_num,prnt,rlsdte,rlstme,duedte,duetme,chld_ordtype,chld_ord,version from peg_ord_dtl
+        where plant = #plant# and ord_type = #ord_type# and ord_num = #ord_num# and version = #version#
+        order by cast(duedte as bigint)*1000000+duetme desc) a left join 
+        erp_sord b on a.plant=b.plant and a.ord_type=b.ord_type and a.ord_num=b.ord_num
+	</insert>
+	 
+	 <select id="dao-EHeijunka.getPegOrdList"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select distinct plant,ord_type,ord_num from peg_ord_dtl
+		where plant= #plant# AND version=#version#
+	</select>
+	
+	<insert id="dao-EHeijunka.insPegOrdDtl" parameterClass="java.util.HashMap">
+		insert into peg_ord_dtl (plant,ord_type,ord_num,item,prnt,req_qty,rlsdte,rlstme,duedte,duetme,chld_ordtype,chld_ord,version)
+		select plant,ord_type,ord_num,item,prnt,req_qty,rlsdte,rlstme,duedte,duetme,chld_ordtype,chld_ord,#version# from tmp_demand
+		where plant=#plant# and prnt in (select item from dta_itm where m_type in ('FG','SF','CM')) 
+	</insert>								
+	
+	<select id="dao-EHeijunka.getTmpDmdCount.count"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select count(*) count from tmp_demand where plant=#plant#
+	</select>
+	
+	<insert id="dao-EHeijunka.insSysLog" parameterClass="java.util.HashMap">
+		insert into sys_log(msg_code,msg_type,msg_datetime,msg_desc) 
+		values(#logCode#,#logType#,getdate(),#logMsg#)		
+	</insert>	
+	
+	<update id="dao-EHeijunka.updErpSord" parameterClass="java.util.HashMap">
+		update erp_sord a
+		set a.strdte=(select top 1 b.e1sdte from eh0010pf b where a.ord_num=b.e1ord),
+    		a.strtme=(select top 1 b.e1stme from eh0010pf b where a.ord_num=b.e1ord),
+    		a.enddte=(select top 1 b.e1edte from eh0010pf b where a.ord_num=b.e1ord),
+    		a.endtme=(select top 1 b.e1etme from eh0010pf b where a.ord_num=b.e1ord),
+    		a.duedte=(select top 1 b.e1edte from eh0010pf b where a.ord_num=b.e1ord),
+    		a.duetme=(select top 1 b.e1etme from eh0010pf b where a.ord_num=b.e1ord)
+		where a.ord_num = #shopOrder#
+	</update>
+	
+	<delete id="dao-EHeijunka.delTmpOpList" parameterClass="java.util.HashMap">
+		delete from tmp_oplist where plant=#plant#
+	</delete>
+	
+	<delete id="dao-EHeijunka.delShopOrderRtn" parameterClass="java.util.HashMap">
+		delete from erp_sord_rtn where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num#
+	</delete>
+	
+<!--
+	<insert id="dao-EHeijunka.insLastOp" parameterClass="java.util.HashMap">
+		insert into tmp_oplist
+		select a.plant,a.item,a.meth,a.op,0,'L','BW' from (select distinct plant,item,meth,op,type from dta_rtn_map where type='PR') a 
+		left join (select distinct plant,item,meth,op,type from dta_rtn_map where type='NE') b 
+		on a.plant=b.plant and a.item=b.item and a.op=b.op
+		where b.item is null and a.item in (select item from erp_sord where plant=#plant# and ord_num=#ord_num# and ord_type=#ord_type#)		
+	</insert>
+	
+	<insert id="dao-EHeijunka.insFirstOp" parameterClass="java.util.HashMap">
+		insert into tmp_oplist
+		select a.plant,a.item,a.meth,a.op,0,'F','FW' from (select distinct plant,item,meth,op,type from dta_rtn_map where type='NE') a 
+		left join (select distinct plant,item,meth,op,type from dta_rtn_map where type='PR') b 
+		on a.plant=b.plant and a.item=b.item and a.op=b.op
+		where b.item is null and a.item in (select item from erp_sord where plant=#plant# and ord_num=#ord_num# and ord_type=#ord_type#)		
+	</insert>
+	
+	<insert id="dao-EHeijunka.insTmpOpListFW" parameterClass="java.util.HashMap">
+		insert into tmp_oplist
+		select plant,item,meth,op_nb,op,'','FW' from dta_rtn_map 
+		where plant=#plant# and item=#item# and meth='DF' and op=#ord_op# and type='NE'			
+	</insert>
+	
+	<insert id="dao-EHeijunka.insTmpOpListBW" parameterClass="java.util.HashMap">
+		insert into tmp_oplist
+		select plant,item,meth,op_nb,op,'','BW' from dta_rtn_map 
+		where plant=#plant# and item=#item# and meth='DF' and op=#ord_op# and type='PR'		
+	</insert>
+-->
+	<insert id="dao-EHeijunka.insLastOp" parameterClass="java.util.HashMap">
+		insert into tmp_oplist
+		select plant,item,meth,op,0,position,'BW' from dta_rtn
+		where position='L' and item in (select item from erp_sord where plant=#plant# and ord_num=#ord_num# and ord_type=#ord_type#)		
+	</insert>
+	
+	<insert id="dao-EHeijunka.insFirstOp" parameterClass="java.util.HashMap">
+		insert into tmp_oplist
+		select plant,item,meth,op,0,position,'FW' from dta_rtn
+		where position='F' and item in (select item from erp_sord where plant=#plant# and ord_num=#ord_num# and ord_type=#ord_type#)		
+	</insert>
+	
+	<insert id="dao-EHeijunka.insTmpOpListFW" parameterClass="java.util.HashMap">
+		insert into tmp_oplist
+		select a.plant,a.item,a.meth,a.op_nb,a.op,b.position,'FW' 
+		from dta_rtn_map a 
+		left join dta_rtn b on a.plant=b.plant and a.item=b.item and a.meth=b.meth and a.op_nb=b.op
+		where a.plant=#plant# and a.item=#item# and a.meth='DF' and a.op=#ord_op# and a.type='NE'			
+	</insert>
+	
+	<insert id="dao-EHeijunka.insTmpOpListBW" parameterClass="java.util.HashMap">
+		insert into tmp_oplist
+		select a.plant,a.item,a.meth,a.op_nb,a.op,b.position,'BW' 
+		from dta_rtn_map a
+		left join dta_rtn b on a.plant=b.plant and a.item=b.item and a.meth=b.meth and a.op_nb=b.op
+		where a.plant=#plant# and a.item=#item# and a.meth='DF' and a.op=#ord_op# and type='PR'		
+	</insert>
+	
+	<update id="dao-EHeijunka.delTmpOpListProcess" parameterClass="java.util.HashMap">
+		delete from tmp_oplist   		
+		where plant=#plant# and item=#item# and meth='DF' and op=#ord_op# and op_nb=#op_nb#
+	</update>
+	
+	<select id="dao-EHeijunka.getRtnForShopOrder"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select a.plant,a.ord_type,a.ord_num,a.item,a.req_qty,a.rlsdte,a.rlstme,a.duedte,a.duetme,b.meth,b.op,b.op_nb,isnull(d.wrkc,0) as wrkc,
+		isnull(d.run_hrs,0) as rtn_runhrs,isnull(mov_hrs+queue_hrs+insp_hrs,0) as rtn_othhrs,isnull(d.batch,1) as batch,b.position, isnull(c.meth,'') as nb_meth,isnull(c.ord_op,0) as nb_op,
+		isnull(c.strdte,0) as nb_strdte,isnull(c.strtme,0) as nb_strtme,isnull(c.enddte,0) as nb_enddte,isnull(c.endtme,0) as nb_endtme,isnull(d.offset_per,0) as offset_per 
+		from erp_sord a 
+		left join (select distinct plant,item,meth,op,op_nb,position,direction from tmp_oplist) b on a.plant=b.plant and a.item=b.item
+		left join exp_rtn_log c on a.plant=c.plant and a.ord_type=c.ord_type and a.ord_num=c.ord_num and c.meth=b.meth and c.ord_op=b.op_nb and c.[version]=#version#
+		left join dta_rtn d on a.plant=d.plant and a.item=d.item and b.op=d.op and d.meth='DF' 
+		where a.plant= #plant# AND a.ord_type=#ord_type# and a.ord_num=#ord_num# 
+		<isNotEmpty prepend=" AND " property="prnt_plant">
+			c.prnt_plant= #prnt_plant#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="prnt_ordtype">
+			c.prnt_ordtype= #prnt_ordtype#
+		</isNotEmpty>
+		<isNotEmpty prepend=" AND " property="prnt_ord">
+			c.prnt_ord= #prnt_ord#
+		</isNotEmpty>
+	</select>
+	
+	<select id="dao-EHeijunka.getRtnForAllocOrd"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select a.plant,a.ord_type,a.ord_num,a.item,a.req_qty,a.rlsdte,a.rlstme,a.duedte,a.duetme,b.meth,b.op,b.op_nb,isnull(d.wrkc,0) as wrkc,
+		isnull(d.run_hrs,0) as rtn_runhrs,isnull(d.batch,1) as batch,b.position, isnull(c.meth,'') as nb_meth,isnull(c.ord_op,0) as nb_op,
+		isnull(c.strdte,0) as nb_strdte,isnull(c.strtme,0) as nb_strtme,isnull(c.enddte,0) as nb_enddte,isnull(c.endtme,0) as nb_endtme,isnull(d.offset_per,0) as offset_per 
+		from erp_sord a 
+		left join (select distinct plant,item,meth,op,op_nb,position,direction from tmp_oplist) b on a.plant=b.plant and a.item=b.item
+		left join exp_rtn_log c on a.plant=c.plant and a.ord_type=c.ord_type and a.ord_num=c.ord_num and c.meth=b.meth and c.ord_op=b.op_nb and c.[version]=#version# and c.prnt_ord=#prnt_ord#
+		left join dta_rtn d on a.plant=d.plant and a.item=d.item and b.op=d.op and d.meth='DF' 
+		where a.plant= #plant# AND a.ord_type=#ord_type# and a.ord_num=#ord_num# 
+	</select>
+	
+	<insert id="dao-EHeijunka.insTmpSordRtn" parameterClass="java.util.HashMap">
+		insert into tmp_sord_rtn(plant,ord_type,ord_num,meth,ord_op,item,req_qty,run_hrs,strdte,strtme,enddte,endtme,position,direction)
+		values(#plant#,#ord_type#,#ord_num#,#meth#,#ord_op#,#item#,#req_qty#,#run_hrs#,#strdte#,#strtme#,#enddte#,#endtme#,#position#,#direction#)		
+	</insert>
+	
+	<select id="dao-EHeijunka.getTmpOpListCount.count"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select count(*) count from tmp_oplist where plant=#plant# and meth='DF'
+	</select>
+	
+	<update id="dao-EHeijunka.delTmpSordRtn" parameterClass="java.util.HashMap">
+		delete from tmp_sord_rtn   		
+		where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num# 
+	</update>
+
+	<insert id="dao-EHeijunka.insErpSordRtnBW" parameterClass="java.util.HashMap">
+		insert into erp_sord_rtn(plant,ord_type,ord_num,meth,ord_op,wrkc,item,req_qty,run_hrs,strdte,strtme,enddte,endtme,position,direction,ostrdte,ostrtme,oenddte,oendtme)
+		select plant,ord_type,ord_num,meth,ord_op,wrkc,item,req_qty,run_hrs,left(strdt,8),right(strdt,6),left(enddt,8),right(enddt,6),position,direction,left(strdt,8),right(strdt,6),left(enddt,8),right(enddt,6)
+ 		from (select plant,ord_type,ord_num,meth,ord_op,wrkc,item,req_qty,run_hrs,min(cast(strdte as bigint)*1000000+strtme) as strdt,min(cast(enddte as bigint)*1000000+endtme) as enddt,position,direction from exp_rtn_log
+		where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num# and [version]=#version#
+		group by plant,ord_type,ord_num,meth,ord_op,wrkc,item,req_qty,run_hrs,position,direction) a		
+	</insert>
+	
+	<insert id="dao-EHeijunka.insErpSordRtnFW" parameterClass="java.util.HashMap">
+		insert into erp_sord_rtn(plant,ord_type,ord_num,meth,ord_op,wrkc,item,req_qty,run_hrs,strdte,strtme,enddte,endtme,position,direction,ostrdte,ostrtme,oenddte,oendtme)
+		select plant,ord_type,ord_num,meth,ord_op,wrkc,item,req_qty,run_hrs,left(strdt,8),right(strdt,6),left(enddt,8),right(enddt,6),position,direction,left(strdt,8),right(strdt,6),left(enddt,8),right(enddt,6)
+ 		from (select plant,ord_type,ord_num,meth,ord_op,wrkc,item,req_qty,run_hrs,max(cast(strdte as bigint)*1000000+strtme) as strdt,max(cast(enddte as bigint)*1000000+endtme) as enddt,position,direction from exp_rtn_log
+		where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num# and [version]=#version#
+		group by plant,ord_type,ord_num,meth,ord_op,wrkc,item,req_qty,run_hrs,position,direction) a		
+	</insert>
+
+	<insert id="dao-EHeijunka.insExpRtnLog" parameterClass="java.util.HashMap">
+		insert into exp_rtn_log(plant,ord_type,ord_num,meth,ord_op,op_nb,wrkc,item,req_qty,run_hrs,strdte,strtme,enddte,endtme,position,direction,version,prnt_plant,prnt_ordtype,prnt_ord,disp_seq)
+		values(#plant#,#ord_type#,#ord_num#,#meth#,#ord_op#,#op_nb#,#wrkc#,#item#,#req_qty#,#run_hrs#,#strdte#,#strtme#,#enddte#,#endtme#,#position#,#direction#,#version#,#prnt_plant#,#prnt_ordtype#,#prnt_ord#,#disp_seq#)		
+	</insert>
+	
+	<select id="dao-EHeijunka.getShopOrderByWC"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">  	
+		select ord_num,ord_op,strdte,strtme,enddte,endtme,plant from erp_sord_rtn
+		where wrkc=#wrkc#
+	</select>
+ 
+	<select id="dao-EHeijunka.getPrntViewData"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select top 1 ord_num,ord_op,bct_enddte,bct_endtme,case when prnt_ord= '' then '' else substring(prnt_ordtype,2,2)+'/'+prnt_ord end as prnt_ord from atd_ord_rtn
+        where [version] in (select max(version) from atd_ord_rtn) and ord_num=#ord_num# and ord_op=#ord_op# and plant=#plant#
+        order by ord_num,ord_op,cast(bct_enddte as bigint)*1000000+bct_endtme
+	</select>
+	
+	<select id="dao-EHeijunka.getChldViewData"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select top 1 dem_ord_num,sup_org_duedte,sup_org_duetme,substring(sup_ord_type,2,2)+'/'+sup_ord_num as chld_ord from peg_alloc_log
+		where [version] in (select max(version) from peg_alloc_log)
+		and dem_ord_num=#ord_num# and dem_plant=#plant#
+		order by cast(sup_org_duedte as bigint)*1000000+sup_org_duetme desc;
+	</select>
+	
+	<update id="dao-EHeijunka.delPrntChldViewbyWC" parameterClass="java.util.HashMap">
+		delete from eh0050pf   		
+		where exists (select 1 from erp_sord_rtn a where a.ord_num=e5ord and a.ord_op=e5op and a.wrkc=#wrkc#) 
+	</update>
+	
+	<insert id="dao-EHeijunka.insPrntChldView" parameterClass="java.util.HashMap">
+		insert into eh0050pf
+		values(#ord_num#,#ord_op#,#chld_duedte#,#chld_duetme#,#chld_ord#,#chld_dly#,#prnt_rlsdte#,#prnt_rlstme#,#prnt_ord#,#prnt_dly#,#plant#)		
+	</insert>
+	
+	<select id="dao-EHeijunka.getRtnMapCount.count"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select count(*) count from dta_rtn_map a 
+		where a.plant=#plant# 
+			and exists (select 1 from erp_sord b where a.plant=b.plant and a.item=b.item and b.ord_num=#ord_num# and b.ord_type=#ord_type#)
+	</select>
+	
+	<select id="dao-EHeijunka.getShopOrderDtaRtn"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select a.ord_num,a.item,a.req_qty,a.rlsdte,a.rlstme,a.duedte,a.duetme,b.op,b.run_hrs,(b.mov_hrs+b.insp_hrs+b.queue_hrs) as oth_hrs,b.const_hrs,b.batch from erp_sord a left join dta_rtn b on a.plant=b.plant and a.item=b.item
+		where b.meth='DF' and a.plant=#plant# and a.ord_type=#ord_type# and a.ord_num=#ord_num# 
+	</select>
+	
+	<insert id="dao-EHeijunka.insShopOrderRtn" parameterClass="java.util.HashMap">
+		insert into erp_sord_rtn(plant,ord_type,ord_num,meth,ord_op,item,req_qty,run_hrs,strdte,strtme,enddte,endtme,position,direction,ostrdte,ostrtme,oenddte,oendtme)
+		values(#plant#,#ord_type#,#ord_num#,#meth#,#ord_op#,#item#,#req_qty#,#run_hrs#,#strdte#,#strtme#,#enddte#,#endtme#,#position#,#direction#,#strdte#,#strtme#,#enddte#,#endtme#)		
+	</insert>
+	
+	<update id="dao-EHeijunka.updErpSordFromRtn" parameterClass="java.util.HashMap">
+		update erp_sord 
+		set rlsdte=isnull((select top 1 strdte from erp_sord_rtn where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num# order by (cast(strdte as bigint)*1000000+strtme)),0),
+    		rlstme=isnull((select top 1 strtme from erp_sord_rtn where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num# order by (cast(strdte as bigint)*1000000+strtme)),0),
+			strdte=isnull((select top 1 strdte from erp_sord_rtn where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num# order by (cast(strdte as bigint)*1000000+strtme)),0),
+    		strtme=isnull((select top 1 strtme from erp_sord_rtn where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num# order by (cast(strdte as bigint)*1000000+strtme)),0),
+    		enddte=isnull((select top 1 enddte from erp_sord_rtn where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num# order by (cast(strdte as bigint)*1000000+strtme) desc),0),
+    		endtme=isnull((select top 1 endtme from erp_sord_rtn where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num# order by (cast(strdte as bigint)*1000000+strtme) desc),0),
+            orlsdte=isnull((select top 1 strdte from erp_sord_rtn where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num# order by (cast(strdte as bigint)*1000000+strtme)),0),
+    		orlstme=isnull((select top 1 strtme from erp_sord_rtn where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num# order by (cast(strdte as bigint)*1000000+strtme)),0),
+    		oduedte=isnull((select top 1 enddte from erp_sord_rtn where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num# order by (cast(strdte as bigint)*1000000+strtme) desc),0),
+    		oduetme=isnull((select top 1 endtme from erp_sord_rtn where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num# order by (cast(strdte as bigint)*1000000+strtme) desc),0)
+		where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num#
+	</update>
+	
+	<insert id="dao-EHeijunka.insDmdFromSOBySbom" parameterClass="java.util.HashMap">
+		insert into tmp_demand (plant,ord_type,ord_num,item,prnt,org_qty,req_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,rlsdte,rlstme,duedte,duetme,schld,chld_ordtype,chld_ord,[version])
+		select a.plant,a.ord_type,a.ord_num,b.chld,a.item,a.req_qty*b.bomqty,a.req_qty*b.bomqty,a.rlsdte,a.rlstme,a.duedte,a.duetme,99999999,999999,99999999,999999,'','','',#version# 
+		from erp_sord a
+		left join dta_sbom b on a.plant=b.plant and a.item=b.item
+		where a.plant=#plant# and b.chld is not null and a.item in (select item from dta_itm where m_type='FG')	
+	</insert>
+	
+	<insert id="dao-EHeijunka.insDmdFromPLBySbom" parameterClass="java.util.HashMap">
+		insert into tmp_demand (plant,ord_type,ord_num,item,prnt,org_qty,req_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,rlsdte,rlstme,duedte,duetme,schld,chld_ordtype,chld_ord,[version])
+		select a.plant,a.ord_type,a.ord_num,b.chld,a.item,a.req_qty*b.bomqty,a.req_qty*b.bomqty,a.rlsdte,a.rlstme,a.duedte,a.duetme,99999999,999999,99999999,999999,'','','',#version# 
+		from erp_plnord a
+		left join dta_sbom b on a.plant=b.plant and a.item=b.item
+		where a.plant=#plant# and b.chld is not null and a.item in (select item from dta_itm where m_type='FG')
+	</insert>
+	
+	<insert id="dao-EHeijunka.insSupOHRMSFG" parameterClass="java.util.HashMap">
+		insert into tmp_supply (plant,ord_type,ord_num,item,org_qty,rem_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,rlsdte,rlstme,duedte,duetme,schld,[version])
+		select a.plant,a.ord_type,a.ord_num,a.item,a.avai_qty+isnull(b.oh_qty,0),a.avai_qty+isnull(b.oh_qty,0),convert(int,convert(varchar(8),getdate(),112)),0,convert(int,convert(varchar(8),getdate(),112)),0,convert(int,convert(varchar(8),getdate(),112)),0,convert(int,convert(varchar(8),getdate(),112)),0,'',#version# 
+		from erp_inv a left join 
+		(select a.plant as plant,b.chld as item,sum(a.req_qty*b.bomqty) as oh_qty 
+			from erp_sord a left join dta_sbom b on a.plant=b.plant and a.item=b.item
+			where a.plant=#plant# and b.chld in (select item from tmp_itemlist)
+			group by a.plant,b.chld) b 
+		on a.plant=b.plant and a.item=b.item
+		where a.plant = #plant# and a.item in (select item from tmp_itemlist)
+	</insert>
+ 	
+	<select id="dao-EHeijunka.getPegOrdRlsDteList"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select distinct plant,ord_type,ord_num,rlsdte,rlstme from peg_ord
+		where plant= #plant# AND version=#version#
+	</select>
+	
+	<update id="dao-EHeijunka.updErpSordFromPeg" parameterClass="java.util.HashMap">
+		update erp_sord 
+		set rlsdte = #rlsdte#,
+			rlstme = #rlstme#,
+			strdte = #rlsdte#,
+			strtme = #rlstme#,
+			enddte = #duedte#,
+    		endtme = #duetme#,
+    		duedte = #duedte#,
+    		duetme = #duetme#
+		where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num#
+	</update>
+	
+	<update id="dao-EHeijunka.updErpPlnOrdFromPeg" parameterClass="java.util.HashMap">
+		update erp_plnord 
+		set rlsdte = #rlsdte#,
+    		rlstme = #rlstme#,
+    		duedte = #duedte#,
+    		duetme = #duetme#
+		where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num#
+	</update>
+	
+	<select id="dao-EHeijunka.getShopOrderWithRtnByPlant"
+		parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select distinct plant,ord_type,ord_num from erp_sord
+		where plant=#plant# and rtrim(ltrim(plant))+rtrim(ltrim(item)) in (select rtrim(ltrim(plant))+rtrim(ltrim(item)) from dta_rtn) 
+		order by plant,ord_type,ord_num
+	</select>
+	
+<!--  	<update id="dao-EHeijunka.delAtdSordAllocByPlant" parameterClass="java.util.HashMap">
+		delete from atd_ord_alloc   		
+		where plant=#plant# 
+	</update>
+-->	
+
+<!--need to modify -->
+	<insert id="dao-EHeijunka.insAtdSordAllocFg" parameterClass="java.util.HashMap">
+		insert into atd_ord_alloc(plant,ord_type,ord_num,prnt_plant,prnt_ordtype,prnt_ord,disp_seq,dispatch,version)
+		select c.plant,c.ord_type,c.ord_num,'','','',@row_number:=@row_number+1 as rowid,'',#version#       
+        from (select a.plant,a.ord_type,a.ord_num,cast(a.duedte as bigint)*1000000+a.duetme,b.priority from erp_sord a left join dta_itm b on a.item=b.item 
+			where b.m_type='FG' and a.plant=#plant#
+			and exists (select 1 from eh0010pf where substr(e1ord,1,14)=a.ord_num)
+			and not exists (select 1 from eh0020pf where substr(e2ord,1,14)=a.ord_num)
+			order by a.duedte*1000000000+a.duetme*1000+b.priority,a.ord_num) c, 
+		(select @row_number:=0) as d
+	</insert>
+	
+	<insert id="dao-EHeijunka.insAtdOrdRtnFg" parameterClass="java.util.HashMap">
+		insert into atd_ord_rtn(plant,ord_type,ord_num,item,ord_op,meth,wrkc,run_hrs,chl_strdte,chl_strtme,chl_enddte,chl_endtme,bct_strdte,bct_strtme,bct_enddte,bct_endtme,position,disp_seq,prnt_plant,prnt_ordtype,prnt_ord,version)
+        select a.plant,a.ord_type,a.ord_num,b.item,b.ord_op,b.meth,b.wrkc,b.run_hrs,0,0,0,0,b.strdte,b.strtme,b.enddte,b.endtme,b.position,a.disp_seq,'','','',#version#
+        from atd_ord_alloc a 
+        left join erp_sord_rtn b on a.plant=b.plant and a.ord_type=b.ord_type and a.ord_num=b.ord_num
+        where [version]=#version# and a.plant=#plant# and a.dispatch=''
+	</insert>
+	
+	<select id="dao-EHeijunka.getDspShopOrderByPlant" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select a.plant,a.ord_type,a.ord_num,ord_op,a.disp_seq,b.wrkc,b.run_hrs,b.req_qty 
+		from atd_ord_alloc a 
+		left join erp_sord_rtn b on a.ord_num = b.ord_num
+		where a.plant=#plant# and version=#version# and a.dispatch=''
+		order by b.wrkc,a.disp_seq,b.ord_op
+	</select>
+	
+	<select id="dao-EHeijunka.getMachineTimeByWrkc" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select top 1 e40wrkc as wrkc,e40mach as mach,isnull(b.maxdt,convert(bigint,replace(replace(replace(CONVERT(varchar,GETDATE(),120),'-',''),' ',''),':',''))) as mindate from eh0040pf a 
+		left join (select e2wrkc,e2mac,max(cast(e2edte as bigint)*1000000+e2etme) as maxdt from eh0020pf
+			where e2wrkc=#wrkc# group by e2wrkc,e2mac) b on a.e40wrkc=e2wrkc and e2mac=e40mach 
+		where e40wrkc=#wrkc#
+		order by mindate
+	</select>
+	
+	<update id="dao-EHeijunka.updAtdSordAllocProcessed" parameterClass="java.util.HashMap">
+		update atd_ord_alloc 
+		set dispatch='Y'
+		where plant=#plant# and version=#version# and dispatch=''
+	</update>
+	
+	<insert id="dao-EHeijunka.insDspOrder" parameterClass="java.util.HashMap">
+		insert into eh0020pf(e2id,e2fac,e2wrkc,e2ord,e2op,e2mac,e2aqty,e2ahrs,e2title,e2type,e2cls,e2sdte,e2stme,e2edte,e2etme,e2uby,e2udte,e2utme)
+		values(#e2id#,#plant#,#wrkc#,#ord_num#,#ord_op#,#mach#,#req_qty#,#run_hrs#,#e2title#,#e2type#,#e2cls#,#strdte#,#strtme#,#enddte#,#endtme#,#updby#,#upddte#,#updtme#)
+	</insert>
+	
+	<update id="dao-EHeijunka.updDspOrderHeader" parameterClass="java.util.HashMap">
+		update eh0010pf 
+		set e1sdte=#strdte#,e1stme=#strtme#,
+		    e1edte=#enddte#,e1etme=#endtme#,
+		    e1ddte=#enddte#,e1dtme=#endtme#
+		where e1fac=#plant# and e1wrkc=#wrkc# and e1ord=#ord_num# and e1op=#ord_op#
+	</update>
+	
+	<insert id="dao-EHeijunka.insAtdSordAllocSfg" parameterClass="java.util.HashMap">
+		insert into atd_ord_alloc(plant,ord_type,ord_num,prnt_plant,prnt_ordtype,prnt_ord,disp_seq,dispatch,version)
+		select b.sup_plant,b.sup_ord_type,b.sup_ord_num,a.plant,a.ord_type,a.ord_num,a.disp_seq,'',#version# 
+		from atd_ord_alloc a left join 
+			(select distinct dem_plant,dem_ord_type,dem_ord_num,sup_plant,sup_ord_type,sup_ord_num from peg_alloc_log 
+			where version=#version# and sup_ord_type in ('2SO','5CO','6FC')) b
+			on a.plant=b.dem_plant and a.ord_type=b.dem_ord_type and a.ord_num=b.dem_ord_num
+		where b.sup_plant is not null and b.sup_plant = #plant# and a.version=#version#
+			and not exists (select 1 from atd_ord_alloc where b.sup_plant=plant and b.sup_ord_type=ord_type and b.sup_ord_num=ord_num and version=#version#)
+			and exists (select 1 from eh0010pf where substr(e1ord,1,14)=b.sup_ord_num)
+			and not exists (select 1 from eh0020pf where substr(e2ord,1,14)=b.sup_ord_num)
+	</insert>
+	
+	<select id="dao-EHeijunka.getDspOrderCount.count" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select count(*) as count from atd_ord_alloc 
+		where plant=#plant# and version=#version# and dispatch=''
+	</select>
+	
+	<delete id="dao-EHeijunka.delOrdBehindMinDte" parameterClass="java.util.HashMap">
+		delete from eh0020pf
+		where e2sdte &gt;= #minStrDte# and e2id not in ('FX')
+	</delete>
+	
+	<select id="dao-EHeijunka.getAllocOrdList" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select a.plant,a.ord_type,a.ord_num,a.disp_seq,a.prnt_plant,a.prnt_ordtype,a.prnt_ord,b.bct_strdte,b.bct_strtme
+		from atd_ord_alloc a
+        left join atd_ord_rtn b on a.prnt_plant=b.plant and a.prnt_ordtype=b.ord_type and a.prnt_ord=b.ord_num and a.version=b.version and b.position='F'
+		where a.plant=#plant# and a.version=#version# and a.dispatch=''
+        order by a.ord_num,a.disp_seq
+	</select>
+	
+	<insert id="dao-EHeijunka.insAtdOrdRtnBW" parameterClass="java.util.HashMap">
+		insert into atd_ord_rtn(plant,ord_type,ord_num,item,ord_op,meth,wrkc,run_hrs,chl_strdte,chl_strtme,chl_enddte,chl_endtme,bct_strdte,bct_strtme,bct_enddte,bct_endtme,position,disp_seq,prnt_plant,prnt_ordtype,prnt_ord,[version])
+		select a.plant,a.ord_type,a.ord_num,a.item,a.ord_op,a.meth,a.wrkc,a.run_hrs,0,0,0,0,left(a.strdt,8),right(a.strdt,6),left(a.enddt,8),right(a.enddt,6),a.position,a.disp_seq,a.prnt_plant,a.prnt_ordtype,a.prnt_ord,a.version
+ 		from (select plant,ord_type,ord_num,meth,ord_op,wrkc,item,req_qty,run_hrs,min(cast(strdte as bigint)*1000000+strtme) as strdt,min(cast(enddte as bigint)*1000000+endtme) as enddt,position,direction,version,prnt_plant,prnt_ordtype,prnt_ord,disp_seq 
+ 			from exp_rtn_log
+			where plant=#plant# and ord_type=#ord_type# and ord_num=#ord_num# and [version]=#version#		
+			group by plant,ord_type,ord_num,meth,ord_op,wrkc,item,req_qty,run_hrs,position,direction,version,prnt_plant,prnt_ordtype,prnt_ord,disp_seq) a
+		where not exists (select 1 from atd_ord_rtn where plant=a.plant and ord_type=a.ord_type and ord_num=a.ord_num and [version]=a.version 
+		 	and prnt_plant=a.prnt_plant and prnt_ordtype=a.prnt_ordtype and prnt_ord=a.prnt_ord and disp_seq=a.disp_seq)		
+	</insert>
+	
+	<insert id="dao-EHeijunka.insTmpItemListByWrkc" parameterClass="java.util.HashMap">
+		insert into tmp_itemlist 
+		select distinct a.plant,a.item from erp_sord_dtl a left join erp_sord b on a.plant=b.plant and a.ord_type=b.ord_type and a.ord_num=b.ord_num
+        where a.plant=#plant# and b.wrkc=#wrkc#
+	</insert>
+	
+	<delete id="dao-EHeijunka.delPegAssignHdByWrkc" parameterClass="java.util.HashMap">
+		delete from peg_assign_hd
+		where plant=#plant# and wrkc=#wrkc#
+	</delete>
+	
+	<delete id="dao-EHeijunka.delPegAssignDtlByWrkc" parameterClass="java.util.HashMap">
+		delete from peg_assign_dtl
+		where plant=#plant# 
+			and exists(select 1 from peg_assign_hd a where a.plant=plant and a.ord_type=ord_type and a.ord_num=ord_num and a.wrkc=#wrkc#)
+	</delete>
+	
+	<insert id="dao-EHeijunka.insPegAssignHd" parameterClass="java.util.HashMap">
+		insert into peg_assign_hd (plant,ord_type,ord_num,item,wrkc,req_qty,org_rlsdte,org_rlstme,org_duedte,org_duetme,rlsdte,rlstme,strdte,strtme,enddte,endtme,duedte,duetme,parm_po,parm_so,parm_pl,version)
+		select a.plant,a.ord_type,a.ord_num,a.item,a.wrkc,a.req_qty,a.rlsdte,a.rlstme,a.duedte,a.duetme,isnull(left(b.rlsdt,8),0),isnull(right(b.rlsdt,6),0),isnull(left(b.rlsdt,8),0),isnull(right(b.rlsdt,6),0),
+		isnull(left(b.duedt,8),0),isnull(right(b.duedt,6),0),isnull(left(b.duedt,8),0),isnull(right(b.duedt,6),0),#parm_po#,#parm_so#,#parm_pl#,#version# 
+		from erp_sord a left join 
+		(select plant,ord_type,ord_num,max(cast(rlsdte as bigint)*1000000+rlstme) rlsdt,max(cast(duedte as bigint)*1000000+duetme) duedt from tmp_demand
+			group by plant,ord_type,ord_num) b 
+		on a.plant=b.plant and a.ord_type=b.ord_type and a.ord_num=b.ord_num
+		where a.plant=#plant# and a.wrkc=#wrkc# 
+	</insert>
+	
+	<insert id="dao-EHeijunka.insPegAssignDtl" parameterClass="java.util.HashMap">
+		insert into peg_assign_dtl (plant,ord_type,ord_num,item,prnt,req_qty,rlsdte,rlstme,duedte,duetme,chld_plant,chld_ordtype,chld_ord,chld_alcqty,chld_duedte,chld_duetme,version)
+		select dem_plant,dem_ord_type,dem_ord_num,sup_item,dem_item,dem_org_qty,dem_rlsdte,dem_rlstme,dem_duedte,dem_duetme,sup_plant,sup_ord_type,sup_ord_num,sup_alc_qty,sup_duedte,sup_duetme,#version# 
+		from peg_alloc_log left join 
+		(select max(id) as lastid from peg_alloc_log where version=#version# group by dem_plant,dem_ord_type,dem_ord_num,sup_item) b on id=b.lastid
+		where version=#version# and lastid is not null 
+			and exists(select 1 from peg_assign_hd a where a.plant=plant and a.ord_type=ord_type and a.ord_num=ord_num and a.plant=#plant# and a.wrkc=#wrkc#)
+	</insert>	
+	
+	<select id="dao-EHeijunka.getPegChkCompltList" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select a.plant,a.ord_type,a.ord_num,a.ord_op,a.ord_row,a.item,b.item_desc,a.req_qty,substring(a.sup_ordtype,2,2),a.sup_ordnum,a.sup_ordop,a.sup_ordrow,
+			substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),1,4) + '-' +
+			substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),5,2) + '-' +
+			substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),7,2) + ' ' +
+			substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),9,2) + ':' +
+			substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),11,2) + ':' +
+			substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),13,2) as ostrdt,
+			substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),1,4) + '-' +
+			substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),5,2) + '-' +
+			substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),7,2) + ' ' +
+			substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),9,2) + ':' +
+			substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),11,2) + ':' +
+			substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),13,2) as sup_duedt
+		from vchld_view a left join dta_itm b on a.item=b.item collate Chinese_PRC_CS_AS
+		where a.plant=#plant# and a.wrkc=#wrkc#
+		order by a.plant,a.ord_type,a.ord_num
+	</select>
+	
+	<select id="dao-EHeijunka.getPegChkCompltDtlList" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select a.ord_op,a.ord_row,a.item,b.item_desc,a.req_qty,substring(a.sup_ordtype,2,2) as sup_ordtype,a.sup_ordnum,
+			substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),1,4) + '-' +
+			substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),5,2) + '-' +
+			substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),7,2) + ' ' +
+			substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),9,2) + ':' +
+			substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),11,2) + ':' +
+			substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),13,2) as dem_rlsdt,
+			substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),1,4) + '-' +
+			substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),5,2) + '-' +
+			substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),7,2) + ' ' +
+			substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),9,2) + ':' +
+			substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),11,2) + ':' +
+			substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),13,2) as sup_duedt,
+			case 
+			when a.sup_duedte=99999999 then -999 
+			else
+				DATEDIFF(HH,
+				substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),1,4) + '-' +
+				substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),5,2) + '-' +
+				substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),7,2) + ' ' +
+				substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),9,2) + ':' +
+				substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),11,2) + ':' +
+				substring(convert(varchar(14),cast(a.sup_duedte as bigint)*1000000+a.sup_duetme),13,2),
+				substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),1,4) + '-' +
+				substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),5,2) + '-' +
+				substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),7,2) + ' ' +
+				substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),9,2) + ':' +
+				substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),11,2) + ':' +
+				substring(convert(varchar(14),cast(a.dem_rlsdte as bigint)*1000000+a.dem_rlstme),13,2))
+			end as gap_hrs
+		from peg_chk_complt a left join dta_itm b on a.item=b.item collate Chinese_PRC_CS_AS
+		where a.plant=#plant# and a.ord_type=#ord_type# and a.ord_num=#ord_num# and a.ord_op=#ord_op# and a.ord_row=#ord_row#
+		order by a.item
+	</select>
+	
+	<insert id="dao-EHeijunka.insArvPegAllocLog" parameterClass="java.util.HashMap">
+		insert into arvpeg_alloc_log
+		select dem_plant,dem_ord_type,dem_ord_num,dem_item,dem_org_qty,dem_req_qty,dem_org_rlsdte,dem_org_rlstme,dem_org_duedte,dem_org_duetme,dem_rlsdte,dem_rlstme,dem_duedte,dem_duetme,dem_schld,dem_peg_lvl,
+		sup_plant,sup_ord_type,sup_ord_num,sup_item,sup_alc_qty,sup_rem_qty,sup_org_rlsdte,sup_org_rlstme,sup_org_duedte,sup_org_duetme,sup_rlsdte,sup_rlstme,sup_duedte,sup_duetme,sup_schld,version 
+		from peg_alloc_log where dem_plant = #plant#
+	</insert>
+	
+	<delete id="dao-EHeijunka.delPegAllocLog" parameterClass="java.util.HashMap">
+		truncate table peg_alloc_log
+	</delete>
+	
+	<select id="dao-EHeijunka.getDspShopOrderByWrkc" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select e1fac as plant,e1ord as ord_num,e1op as ord_op,e1wrkc as wrkc,e1rqty as req_qty,e1rhrs as run_hrs,isnull(e5cdte,e1osdt) as e1sdte,isnull(e5ctme,e1ostm) as e1stme 
+		from eh0010pf left join eh0050pf on e1fac=e5fac and e1ord=e5ord and e1op=e5op 
+		where e1ord+convert(varchar(2),e1op) not in (select e2ord+convert(varchar(2),e2op) from eh0020pf)
+			and e1fac=#plant# and e1wrkc=#wrkc#
+		order by e1sdte,e1stme,e1ord,e1op
+	</select>
+	
+	<delete id="dao-EHeijunka.delTmpAssignDtlByWrkc" parameterClass="java.util.HashMap">
+		delete from tmp_assign_dtl
+		where plant=#plant# 
+			and plant+ord_type+ord_num) in (select plant+ord_type+ord_num) from erp_sord where plant=#plant# and wrkc=#wrkc#)
+	</delete>	
+		
+	<insert id="dao-EHeijunka.insTmpAssignDtl" parameterClass="java.util.HashMap">
+		insert into tmp_assign_dtl
+		select dem_plant,dem_ord_type,dem_ord_num,dem_item,dem_org_qty,dem_req_qty,dem_org_rlsdte,dem_org_rlstme,dem_org_duedte,dem_org_duetme,dem_rlsdte,dem_rlstme,dem_duedte,dem_duetme,dem_schld,dem_peg_lvl,
+		sup_plant,sup_ord_type,sup_ord_num,sup_item,sup_alc_qty,sup_rem_qty,sup_org_rlsdte,sup_org_rlstme,sup_org_duedte,sup_org_duetme,sup_rlsdte,sup_rlstme,sup_duedte,sup_duetme,sup_schld,version 
+		from peg_alloc_log where dem_plant = #plant#
+	</insert>
+	
+	<update id="dao-EHeijunka.execBalDemSupByPlant" parameterClass="java.util.HashMap" >
+		exec BalDemSupByPlant #plant#,#parm_oh#,#parm_po#,#parm_so#,#parm_pl#,Y,Y
+	</update>	
+	
+</sqlMap>

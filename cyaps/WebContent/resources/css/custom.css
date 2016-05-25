@@ -1,0 +1,11 @@
+.temporary-step {
+	background-color: red;
+}
+
+.output-confirmed {
+	color: green;
+}
+
+.output-rejected {
+	color: red;
+}

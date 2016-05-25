@@ -1,0 +1,240 @@
+body {
+	font-family: arial, tahoma, helvetica, sans-serif;
+}
+
+.sch-event {
+	background: -webkit-gradient(linear, center top, center bottom, from(#fff),
+		to(#ddd));
+	border-left-color: #ccc;
+	border-left-color: #ddd;
+	border-top-color: transparent;
+	border-bottom-color: #ccc;
+}
+
+.sch-event-red {
+	background-color: red;
+	background: -webkit-gradient(linear, center top, center bottom, from(#fff),
+		to(#ddd));
+	border-left-color: #ccc;
+	border-left-color: #ddd;
+	border-top-color: transparent;
+	border-bottom-color: #ccc;
+}
+
+.sch-event-blue {
+	background-color: blue;
+	background: -webkit-gradient(linear, center top, center bottom, from(#fff),
+		to(#ddd));
+	border-left-color: #ccc;
+	border-left-color: #ddd;
+	border-top-color: transparent;
+	border-bottom-color: #ccc;
+}
+
+.sch-event-yellow {
+	background-color: yellow;
+	background: -webkit-gradient(linear, center top, center bottom, from(#fff),
+		to(#ddd));
+	border-left-color: #ccc;
+	border-left-color: #ddd;
+	border-top-color: transparent;
+	border-bottom-color: #ccc;
+}
+
+.sch-event-gray {
+	background-color: gray;
+	background: -webkit-gradient(linear, center top, center bottom, from(#fff),
+		to(#ddd));
+	border-left-color: #ccc;
+	border-left-color: #ddd;
+	border-top-color: transparent;
+	border-bottom-color: #ccc;
+}
+
+.sch-event-orange {
+	background-color: orange;
+	background: -webkit-gradient(linear, center top, center bottom, from(#fff),
+		to(#ddd));
+	border-left-color: #ccc;
+	border-left-color: #ddd;
+	border-top-color: transparent;
+	border-bottom-color: #ccc;
+}
+
+.sch-event-chocolate {
+	background-color: chocolate;
+	background: -webkit-gradient(linear, center top, center bottom, from(#fff),
+		to(#ddd));
+	border-left-color: #ccc;
+	border-left-color: #ddd;
+	border-top-color: transparent;
+	border-bottom-color: #ccc;
+}
+
+.sch-event-yellowgreen {
+	background-color: yellowgreen;
+	background: -webkit-gradient(linear, center top, center bottom, from(#fff),
+		to(#ddd));
+	border-left-color: #ccc;
+	border-left-color: #ddd;
+	border-top-color: transparent;
+	border-bottom-color: #ccc;
+}
+
+.sch-event-green {
+	background-color: green;
+	background: -webkit-gradient(linear, center top, center bottom, from(#fff),
+		to(#ddd));
+	border-left-color: #ccc;
+	border-left-color: #ddd;
+	border-top-color: transparent;
+	border-bottom-color: #ccc;
+}
+
+.sch-event-hover {
+	border: 1px solid #555;
+}
+
+.startTime {
+	color: #777;
+	font-weight: bold;
+}
+
+.programName {
+	font-weight: bold;
+	color: #15428B;
+	padding-left: 5px;
+}
+
+.radiotip {
+	font-weight: bold;
+	color: #15428B;
+}
+
+.duration {
+	color: #aaa;
+	display: block;
+}
+
+.x-grid-inner-locked .x-grid-row .x-grid-cell-first {
+	background-image: -moz-linear-gradient(-45deg, #dde, #fff);
+	background: -webkit-gradient(linear, left top, right bottom, from(#dde),
+		to(#fff));
+	border: 1px solid Gray;
+}
+
+.x-grid-td-0 .x-grid-cell-inner {
+	position: relative;
+}
+
+.x-column-header-text {
+	font-weight: bold;
+	font-size: 20px;
+	color: #15428B;
+}
+
+.station-img {
+	width: 105px;
+}
+
+.sch-timeline {
+	border-left: 2px solid red;
+}
+
+.x-column-header {
+	border-color: transparent !important;
+}
+
+.x-grid-header {
+	background: transparent;
+}
+
+.x-grid, .x-panel-body, .x-panel .x-grid-body {
+	background-color: transparent;
+}
+
+.sch-schedulerpanel .x-grid-hd-inner {
+	font-size: 20px;
+	font-weight: bold;
+	color: Navy;
+	background: transparent !important;
+	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.sch-schedulerview {
+	background: none repeat scroll 0 0 #F5F5F5;
+}
+
+.x-grid-with-row-lines .x-grid-cell {
+	border-color: transparent;
+}
+
+.x-grid-inner-locked .x-grid-view {
+	border-right: none;
+}
+
+.sch-resourcezone, .availability-scheduler .sch-event {
+	background-color: #FFFFFF;
+}
+
+div.optimal {
+	color: #FFF;
+	text-shadow: rgba(0, 0, 0, .2) 0 -1px 0;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	background-color: Turquoise;
+	-webkit-box-shadow: 1px 1px 1px rgba(200, 200, 200, 0.1);
+	-moz-box-shadow: 1px 1px 1px rgba(100, 100, 100, 0.1);
+	box-shadow: 1px 1px 1px rgba(200, 200, 200, 0.1);
+}
+
+.icon-delete {
+	background: transparent url(images/cross.png) no-repeat left center
+		!important;
+}
+
+.sch-event-header {
+	font-weight: bold;
+	overflow: hidden;
+	font-size: 0.9em;
+	padding: 3px;
+}
+
+.image-ct {
+	text-align: center;
+}
+
+.editorpanel .profile-image {
+	margin-top: 12px;
+	padding: 2px;
+	border: 1px solid lightblue;
+	height: 80px;
+}
+
+<!--
+//////////////////
+-->
+.icon-prev, .icon-previous {
+	background: url(images/arrow_left.png) no-repeat left center !important;
+}
+
+.icon-next {
+	background: url(images/arrow_right.png) no-repeat left center !important;
+}
+
+.icon-calendar {
+	background: url(images/calendar.png) no-repeat left center !important;
+}
+
+.icon-horizontal {
+	background: url(images/horizontal.png) no-repeat left center;
+}
+
+.icon-vertical {
+	background: url(images/vertical.png) no-repeat left center;
+}
+
+.icon-delete {
+	background: transparent url(images/cross.png) no-repeat left center
+		!important;
+}

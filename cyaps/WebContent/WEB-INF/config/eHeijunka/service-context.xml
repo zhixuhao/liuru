@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"  
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+	xmlns:dwr="http://www.directwebremoting.org/schema/spring-dwr"  
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd 
+	http://www.directwebremoting.org/schema/spring-dwr 
+	http://www.directwebremoting.org/schema/spring-dwr-2.0.xsd"> 
+
+	<bean id="service-EHeijunkaService"
+		class="com.liuru.services.EHeijunkaService" scope="prototype">
+		<property name="eheijunka">
+			<ref bean="model-EHeijunka"/>
+		</property>
+		<dwr:remote javascript="EHeijunkaService">
+			<!--dwr:include method="isEmpty" /-->
+		</dwr:remote>
+	</bean>
+		
+	<bean id="service-SessionListener"
+		class="com.liuru.services.SessionListener" scope="prototype">
+		<property name="eheijunka">
+			<ref bean="model-EHeijunka"/>
+		</property>
+	</bean>
+
+	<bean id="service-ImportDataService"
+		class="com.liuru.services.ImportDataService" scope="prototype">
+		<property name="eheijunka">
+			<ref bean="model-EHeijunka"/>
+		</property>
+		<dwr:remote javascript="ImportDataService">
+			<!--dwr:include method="isEmpty" /-->
+		</dwr:remote>
+	</bean>
+	
+	<bean id="service-PeggingService"
+		class="com.liuru.services.PeggingService" scope="prototype">
+		<property name="eheijunka">
+			<ref bean="model-EHeijunka"/>
+		</property>
+		<dwr:remote javascript="PeggingService">
+			<!--dwr:include method="isEmpty" /-->
+		</dwr:remote>
+	</bean>
+	
+	<bean id="service-CommonService"
+		class="com.liuru.services.CommonService" scope="prototype">
+		<property name="eheijunka">
+			<ref bean="model-EHeijunka"/>
+		</property>
+		<dwr:remote javascript="CommonService">
+			<!--dwr:include method="isEmpty" /-->
+		</dwr:remote>
+	</bean>
+
+</beans>

@@ -1,0 +1,258 @@
+<html>
+<head>
+
+<title>Ext.ux.Multiselect/ItemSelector</title>
+
+<link rel='stylesheet' type='text/css'
+	href='../../../ext-1.1/resources/css/ext-all.css'>
+<link rel='stylesheet' type='text/css' href='Multiselect.css'>
+
+<script type="text/javascript"
+	src="../../../ext-1.1/adapter/ext/ext-base.js"></script>
+<script type="text/javascript" src="../../../ext-1.1/ext-all-debug.js"></script>
+
+<script type="text/javascript" src="Multiselect.js"></script>
+<script type="text/javascript" src="DDView.js"></script>
+
+
+<script type="text/javascript">
+Ext.onReady(function(){
+
+    Ext.QuickTips.init();
+    Ext.form.Field.prototype.msgTarget = 'side';
+    
+
+	/*
+	 * Ext.ux.Multiselect Example Code
+	 */
+
+	var formMultiselect = new Ext.form.Form({ labelWidth: 75 });
+	
+	var multiselect = new Ext.ux.Multiselect({
+		
+		name              :  'multiselect',
+		fieldLabel        :  'Multiselect',
+		
+		//store           :  null,
+		
+		dataFields        :  ['code', 'desc'], 
+		data              :  [['1', 'One'], ['2', 'Two'], ['3', 'Three'], ['4', 'Four'], ['5', 'Five']],
+		
+		valueField        :  'code',
+		displayField      :  'desc',
+		
+		width             :  150,
+		height            :  150,
+		
+		allowBlank        :  true,
+		minLength         :  0,
+		maxLength         :  Number.MAX_VALUE,
+		blankText         :  Ext.form.TextField.prototype.blankText,
+		minLengthText     : 'Minimum {0} item(s) required',
+		maxLengthText     : 'Maximum {0} item(s) allowed'
+		
+	});
+
+	formMultiselect.add(multiselect);
+	
+	formMultiselect.addButton('Get Value', function() { alert(formMultiselect.getValues(true)); })
+	formMultiselect.addButton('Set Value (2,3)', function() { multiselect.setValue('2,3'); })
+	formMultiselect.addButton('Mark Invalid', function() { multiselect.markInvalid('Invalid'); })
+	formMultiselect.addButton('Toggle Enabled', function() { if(!multiselect.disabled) {multiselect.disable();} else {multiselect.enable();} });
+	formMultiselect.addButton('Reset', function() { multiselect.reset();});
+
+	formMultiselect.render('form-ct-multiselect');
+	
+	
+	/*
+	 * Ext.ux.ItemSelector Example Code
+	 */
+	
+	var formItemSelector = new Ext.form.Form({ labelWidth: 75 });
+	
+	var itemSelector = new Ext.ux.ItemSelector({
+		 
+		 name              : 'itemselector',
+		 fieldLabel        : 'ItemSelector',
+		 
+		 //store           :  null,
+		 
+		 dataFields        :  ['code', 'desc'],
+		 
+		 fromData          :  [['1', 'One'], ['2', 'Two'], ['3', 'Three'], ['4', 'Four'], ['5', 'Five']],
+		 toData            :  [['6', 'Six']],
+		 
+		 msWidth           : 100,
+		 msHeight          : 200,
+		 
+		 valueField        : 'code',
+		 displayField      : 'desc'
+		 
+	});
+	
+	formItemSelector.add(itemSelector);
+	
+	formItemSelector.addButton('Get Value', function() { alert(formItemSelector.getValues(true)); })
+	formItemSelector.addButton('Mark Invalid', function() { itemSelector.markInvalid('Invalid'); })
+
+	formItemSelector.render('form-ct-itemselector');
+	
+	
+});
+
+
+</script>
+
+</head>
+
+<body style="margin: 20px;">
+
+	<b>Ext.ux.Multiselect/ItemSelector</b>,
+	<i>Version 2.1</i>
+
+	<hr>
+
+	<b>Download</b>
+	<br>
+	<a href="MultiselectItemSelector-2.1.zip">MultiselectItemSelector-2.1.zip</a>
+
+	<hr>
+
+	<b>Ext Version</b>
+	<br> Ext-1.1
+
+	<hr>
+
+	<b>Author</b>
+	<br> Figtree Systems,
+	<a href="mailto:toby.stuart@figtreesys.com.au">toby.stuart@figtreesys.com.au</a>
+
+	<hr>
+
+	<b>Demos</b>
+	<br>
+
+	<div style="width: 450px;">
+		<div class="x-box-tl">
+			<div class="x-box-tr">
+				<div class="x-box-tc"></div>
+			</div>
+		</div>
+		<div class="x-box-ml">
+			<div class="x-box-mr">
+				<div class="x-box-mc">
+					<div id="form-ct-multiselect"></div>
+				</div>
+			</div>
+		</div>
+		<div class="x-box-bl">
+			<div class="x-box-br">
+				<div class="x-box-bc"></div>
+			</div>
+		</div>
+	</div>
+
+	<br>
+	<p>
+	<div style="width: 450px;">
+		<div class="x-box-tl">
+			<div class="x-box-tr">
+				<div class="x-box-tc"></div>
+			</div>
+		</div>
+		<div class="x-box-ml">
+			<div class="x-box-mr">
+				<div class="x-box-mc">
+					<div id="form-ct-itemselector"></div>
+				</div>
+			</div>
+		</div>
+		<div class="x-box-bl">
+			<div class="x-box-br">
+				<div class="x-box-bc"></div>
+			</div>
+		</div>
+	</div>
+
+	<hr>
+
+	<b>Changelog</b>
+	<br>
+
+	<table border=1 cellpadding=3 width=100%>
+		<tr>
+			<td><b>Version</b></td>
+			<td><b>Date</b></td>
+			<td><b>Comments</b></td>
+		</tr>
+
+		<tr>
+			<td>2.1</td>
+			<td>27 September 2007</td>
+			<td>Fixes<br> &nbsp;- General<br> &nbsp&nbsp&nbsp;-
+				draggable now spelt correctly in all places :)<br>
+				&nbsp&nbsp&nbsp;- Queries to the store in setValue now match whole
+				value correctly (rather than partial match)<br> &nbsp;-
+				ItemSelector<br> &nbsp&nbsp&nbsp;- value now initialised
+				onRender<br> &nbsp;- DDView<br> &nbsp&nbsp&nbsp;- fixed
+				bug that prevented drag from working after dragging items onto
+				anything but a valid drop zone
+			</td>
+		</tr>
+
+		<tr>
+			<td>2.0</td>
+			<td>19 September 2007</td>
+			<td>Enhancements<br> &nbsp;- General<br>
+				&nbsp&nbsp&nbsp;- Now uses Animal's DDView<br> &nbsp;-
+				ItemSelector<br> &nbsp&nbsp&nbsp;- Move to top/bottom
+				navigation buttons<br> &nbsp&nbsp&nbsp;- When using navigation
+				buttons items remain selected in destination list<br> &nbsp;-
+				Multiselect<br> &nbsp&nbsp&nbsp;- Border dropped when marked
+				invalid for better visuals (less jumping/popping)<br>
+				&nbsp&nbsp&nbsp;- Validation for blank, min length and max length<br>
+				&nbsp&nbsp&nbsp;- Ext.form.Field.getName() now returns correct name
+
+			</td>
+		</tr>
+		<tr>
+			<td>1.2</td>
+			<td>23 August 2007</td>
+			<td>Enhancements<br> - Added ItemSelector (beta)<br>
+			</td>
+		</tr>
+		<tr>
+			<td>1.1</td>
+			<td>16 August 2007</td>
+			<td>Fixes/Enhancements<br> - Can now bind to external data
+				store<br> - List items are now unselectable (prevents text
+				highlight/selection)<br> - Enabled/disabled now works correctly<br>
+				- Reset now properly clears selections<br> - Click and Change
+				events added
+			</td>
+		</tr>
+		<tr>
+			<td>1.0</td>
+			<td>14 August 2007</td>
+			<td>Release</td>
+		</tr>
+	</table>
+
+	<hr>
+
+	<b>Features</b>
+	<br>
+
+	<hr>
+
+	<b>Future</b>
+	<br>
+	<p>
+	<hr>
+
+	<b>Basic Usage</b>
+	<br>
+	<p>View source for example code
+</body>
+
+</html>
