@@ -59,14 +59,9 @@ public class cal_time extends HttpServlet {
 		}
 		else if (method.equals("edit")) {
 			String id = request.getParameter("id");
-			String wcal_type = request.getParameter("wcal_type");
-			String plant = request.getParameter("plant");
-			String wrkc = request.getParameter("wrkc");
-			String mach = request.getParameter("mach");
 			String cal_code = request.getParameter("cal_code");
 			String wt_code = request.getParameter("wt_code");
-			sql = "update dta_cal_ws set wcal_type = '"+wcal_type+"',"+"plant='"+plant+"',"+"wrkc='"
-			+wrkc+"',"+"mach='"+mach+"',"+"cal_code='"+cal_code+"',"+"wt_code='"+wt_code+"',"+"chg_by='"+(String)(session.getAttribute("user_name"))+"',"+"chg_date='"+timenow+"'"
+			sql = "update dta_cal_ws set cal_code='"+cal_code+"',"+"wt_code='"+wt_code+"',"+"chg_by='"+(String)(session.getAttribute("user_name"))+"',"+"chg_date='"+timenow+"'"
 			+" where id = '"+ id +"'";
 			
 			datam.edit_sql(sql);
@@ -78,10 +73,127 @@ public class cal_time extends HttpServlet {
 			String mach = request.getParameter("mach");
 			String cal_code = request.getParameter("cal_code");
 			String wt_code = request.getParameter("wt_code");
+			if(wcal_type.equals("P")){
+				wrkc = "";
+				mach = "";
+			}
+			if(wcal_type.equals("W")){
+				mach = "";
+			}
 			sql = "insert into dta_cal_ws (wcal_type,plant,wrkc,mach,cal_code,wt_code,crt_by,crt_date) values(" + "'" + wcal_type 
 					+"',"+"'"+plant+"',"+"'"+wrkc+"',"+"'"+mach+"',"+"'"+cal_code+"',"+"'"+wt_code+"',"+"'"
 					+(String)(session.getAttribute("user_name"))+"',"+"'"+timenow + "')";
 			datam.add_sql(sql);
+		}
+		else if(method.equals("add_plant")){
+			try {
+				sql = "select plant from dta_plant ";
+				ResultSet rs = datam.slect_sql(sql);
+				ResultSetMetaData metaData = rs.getMetaData();  
+				int columnCount = metaData.getColumnCount(); 
+				while (rs.next()) {
+					JSONObject jsonObj = new JSONObject();
+					for (int i = 1; i <= columnCount; i++) {  
+			            String columnName =metaData.getColumnLabel(i); 
+			            columnName = columnName.toUpperCase();
+			            String value = rs.getString(columnName);  
+			            jsonObj.put(columnName, value);  
+			        }
+			        array.add(jsonObj); 
+				}
+				System.out.println(array);
+				pw.print(array);
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+		else if(method.equals("add_wrkc")){
+			try {
+				sql = "select wrkc,plant from dta_wrkc ";
+				ResultSet rs = datam.slect_sql(sql);
+				ResultSetMetaData metaData = rs.getMetaData();  
+				int columnCount = metaData.getColumnCount(); 
+				while (rs.next()) {
+					JSONObject jsonObj = new JSONObject();
+					for (int i = 1; i <= columnCount; i++) {  
+			            String columnName =metaData.getColumnLabel(i); 
+			            columnName = columnName.toUpperCase();
+			            String value = rs.getString(columnName);  
+			            jsonObj.put(columnName, value);  
+			        }
+			        array.add(jsonObj); 
+				}
+				System.out.println(array);
+				pw.print(array);
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+		else if(method.equals("add_mach")){
+			try {
+				sql = "select mach,wrkc from dta_mach ";
+				ResultSet rs = datam.slect_sql(sql);
+				ResultSetMetaData metaData = rs.getMetaData();  
+				int columnCount = metaData.getColumnCount(); 
+				while (rs.next()) {
+					JSONObject jsonObj = new JSONObject();
+					for (int i = 1; i <= columnCount; i++) {  
+			            String columnName =metaData.getColumnLabel(i); 
+			            columnName = columnName.toUpperCase();
+			            String value = rs.getString(columnName);  
+			            jsonObj.put(columnName, value);  
+			        }
+			        array.add(jsonObj); 
+				}
+				System.out.println(array);
+				pw.print(array);
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+		else if(method.equals("add_cal")){
+			try {
+				sql = "select cal_code from dta_cal ";
+				ResultSet rs = datam.slect_sql(sql);
+				ResultSetMetaData metaData = rs.getMetaData();  
+				int columnCount = metaData.getColumnCount(); 
+				while (rs.next()) {
+					JSONObject jsonObj = new JSONObject();
+					for (int i = 1; i <= columnCount; i++) {  
+			            String columnName =metaData.getColumnLabel(i); 
+			            columnName = columnName.toUpperCase();
+			            String value = rs.getString(columnName);  
+			            jsonObj.put(columnName, value);  
+			        }
+			        array.add(jsonObj); 
+				}
+				System.out.println(array);
+				pw.print(array);
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+		else if(method.equals("add_time")){
+			try {
+				sql = "select wt_code from dta_cal_wrktime ";
+				ResultSet rs = datam.slect_sql(sql);
+				ResultSetMetaData metaData = rs.getMetaData();  
+				int columnCount = metaData.getColumnCount(); 
+				while (rs.next()) {
+					JSONObject jsonObj = new JSONObject();
+					for (int i = 1; i <= columnCount; i++) {  
+			            String columnName =metaData.getColumnLabel(i); 
+			            columnName = columnName.toUpperCase();
+			            String value = rs.getString(columnName);  
+			            jsonObj.put(columnName, value);  
+			        }
+			        array.add(jsonObj); 
+				}
+				System.out.println(array);
+				pw.print(array);
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
 		}
 		else if(method.equals("add_cstm")){
 			String cstm_date = request.getParameter("cstm_date");

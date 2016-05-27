@@ -140,13 +140,15 @@
 		  </div>
 		</div>
 	</div>
+
+	
 	<div class="am-modal am-modal-alert" tabindex="-1" id="calws_edit">
 		<div class="am-modal-dialog">
-			<div class="am-modal-hd">日历时间编辑</div>
+			<div class="am-modal-hd" id="cal_time_title">日历时间编辑</div>
     		<div class="am-modal-bd">
       		<form method="post" class="am-form">
       		<div class="am-g am-g-fixed">
-      			<div class="am-u-sm-6" id = "type_selectid" style = "display:none">
+      			<div class="am-u-sm-6" id = "type_divid" >
 				<label>类型</label>
 				<select data-am-selected id="select_typeid" onchange="select_type()">
 				  <option value="P" id="plantselid">Plant</option>
@@ -154,33 +156,35 @@
 				  <option value="M" id="machselid" selected>Mach</option>
 				</select>
 				</div>
-				<div class="am-u-sm-6" id = "type_textid">
-				<label>类型</label>
-				<input type="text" id="typeinput_textid" value="" required>
-				</div>
-				<div class="am-u-sm-6">
+				
+				<div class="am-u-sm-6" id = "plant_divid">
 				<label>PLANT</label>
-				<input type="text" id="plantid" value="" required>
+				<select data-am-selected id="plant_selid" onchange = "select_plant()">
+				</select>
 				</div>
 			</div>
 			<div class="am-g am-g-fixed">
-				<div class="am-u-sm-6">
+				<div class="am-u-sm-6" id = "wrkc_divid">
 				<label>WRKC</label>
-				<input type="text" id="wrkcid" value="" >
+				<select data-am-selected id="wrkc_selid" onchange = "select_wrkc()">
+				</select>
 				</div>
-				<div class="am-u-sm-6">
+				<div class="am-u-sm-6" id = "mach_divid">
 				<label>MACH</label>
-				<input type="text" id="machid" value="" >
+				<select data-am-selected id="mach_selid" >
+				</select>
 				</div>
 			</div>
 			<div class="am-g am-g-fixed" id = "cal_time_div_id">
 				<div class="am-u-sm-6">
 				<label>日历</label>
-				<input type="text" id="calid" value="" required>
+				<select data-am-selected id="cal_selid" >
+				</select>
 				</div>
 				<div class="am-u-sm-6">
 				<label>工作时间</label>
-				<input type="text" id="timeid" value="" required>
+				<select data-am-selected id="time_selid" >
+				</select>
 				</div>
 			</div>
 			
@@ -355,24 +359,38 @@ function menuclick(id){
 }
 function select_type(){
 	if(document.getElementById("select_typeid").value == 'P'){
-		document.getElementById("plantid").disabled = false;
-		document.getElementById("wrkcid").disabled = true;
-		document.getElementById("machid").disabled = true;
-		document.getElementById("wrkcid").value = "";
-		document.getElementById("machid").value = "";
+		document.getElementById("mach_divid").style.display = "none";
+		document.getElementById("wrkc_divid").style.display = "none";
+		
 	}
 	if(document.getElementById("select_typeid").value == 'W'){
-		document.getElementById("plantid").disabled = false;
-		document.getElementById("wrkcid").disabled = false;
-		document.getElementById("machid").disabled = true;
-		document.getElementById("machid").value = "";
+		document.getElementById("wrkc_divid").style.display = "block";
+		document.getElementById("mach_divid").style.display = "none";
 	}
 	if(document.getElementById("select_typeid").value == 'M'){
-		document.getElementById("plantid").disabled = false;
-		document.getElementById("wrkcid").disabled = false;
-		document.getElementById("machid").disabled = false;
+		document.getElementById("mach_divid").style.display = "block";
+		document.getElementById("mach_divid").style.display = "block";
 	}
 	
+}
+function select_plant(){
+	var p_value = document.getElementById("plant_selid").value;
+	$("#wrkc_selid option").each(function(){
+		$(this).attr("disabled",true);
+	});
+	$("#wrkc_selid ."+p_value+"_pwid").each(function(){
+		$(this).attr("disabled",false);
+	});
+}
+function select_wrkc(){
+	var w_value = document.getElementById("wrkc_selid").value;
+	$("#mach_selid option").each(function(){
+		$(this).attr("disabled",true);
+	});
+	$("#mach_selid ."+w_value+"_wmid").each(function(){
+		
+		$(this).attr("disabled",false);
+	});
 }
 function cstm_click(action,id,type,plant,wrkc,mach){
 	wmethod = "cstm_click";
@@ -442,23 +460,23 @@ function add_cstm(action){
 	var reg7 = new RegExp("^20[0-9][0-9]-1[0-2]-0[1-9]$");
 	var reg8 = new RegExp("^20[0-9][0-9]-1[0-2]-[1-3][0-9]$");
 	if(!reg5.test(cstm_date) && !reg6.test(cstm_date) && !reg7.test(cstm_date)&& !reg8.test(cstm_date)){
-		alert("请正确输入日期！");
+		alert("请正确输入日期,例:2016-01-01");
 		return;
 	}
 	if(!reg1.test(sh) && !reg2.test(sh) && !reg3.test(sh)){
-		alert("请正确输入起始时间！");
+		alert("请正确输入起始时间,例:08:30");
 		return;
 	}
 	if(!reg4.test(sm) ){
-		alert("请正确输入起始时间！");
+		alert("请正确输入起始时间,例:08:30");
 		return;
 	}
 	if(!reg1.test(eh) && !reg2.test(eh) && !reg3.test(eh)){
-		alert("请正确输入结束时间！");
+		alert("请正确输入结束时间,例:20:30");
 		return;
 	}
 	if(!reg4.test(em)){
-		alert("请正确输入结束时间！");
+		alert("请正确输入结束时间,例:20:30");
 		return;
 	}
 	$.ajax({  
@@ -561,55 +579,158 @@ function delete_cstm(action,type,plant,wrkc,mach,cstm_date,starttime,endtime){
   function add_click(){
 	  wmethod = "add";
 	  wid="";
-	  document.getElementById("plantid").value = "";
-	  document.getElementById("wrkcid").value = "";
-	  document.getElementById("machid").value = "";
-	  document.getElementById("calid").value = "";
-	  document.getElementById("timeid").value = "";
-	  document.getElementById("plantid").disabled = false;
-	  document.getElementById("wrkcid").disabled = false;
-	  document.getElementById("machid").disabled = false;
-	  document.getElementById("type_textid").style.display = "none";
-	  document.getElementById("type_selectid").style.display = "block";
+	  var jsondatap = {};
+	  jsondatap.method = "add_plant";
+	  $.ajax({  
+	        type : 'POST',  
+	        contentType : 'application/x-www-form-urlencoded; charset=UTF-8',   
+	        url : 'cal_time',  
+	        data : jsondatap,  
+	        dataType : 'html',  
+	        success : function(data) { 
+	    	   var result = JSON.parse(data);  
+	             
+	           $('#plant_selid option').remove();//移除先前数据  
+	           $('#plant_selid').append('<option value = "" selected></option>');
+	           for ( var i = 0; i < result.length; i++) {  
+	               $('#plant_selid').append(
+	               '<option value="' +result[i].PLANT +'">'+result[i].PLANT+'</option>'
+	               )}  
+	           }       
+	} );
+	  var jsondataw = {};
+	  jsondataw.method = "add_wrkc";
+	  $.ajax({  
+	        type : 'POST',  
+	        contentType : 'application/x-www-form-urlencoded; charset=UTF-8',   
+	        url : 'cal_time',  
+	        data : jsondataw,  
+	        dataType : 'html',  
+	        success : function(data) { 
+	    	   var result = JSON.parse(data);  
+	             
+	           $('#wrkc_selid option').remove();//移除先前数据  
+	           $('#wrkc_selid').append('<option value = "" selected></option>');
+	           for ( var i = 0; i < result.length; i++) {  
+	               $('#wrkc_selid').append(
+	               '<option value="' +result[i].WRKC +'" class = "'+result[i].PLANT+'_pwid'+'">'+result[i].WRKC+'</option>'
+	               )}  
+	           }       
+	} );
+	  var jsondatam = {};
+	  jsondatam.method = "add_mach";
+	  $.ajax({  
+	        type : 'POST',  
+	        contentType : 'application/x-www-form-urlencoded; charset=UTF-8',   
+	        url : 'cal_time',  
+	        data : jsondatam,  
+	        dataType : 'html',  
+	        success : function(data) { 
+	    	   var result = JSON.parse(data);  
+	             
+	           $('#mach_selid option').remove();//移除先前数据  
+	           $('#mach_selid').append('<option value = "" selected></option>');
+	           for ( var i = 0; i < result.length; i++) {  
+	               $('#mach_selid').append(
+	               '<option value="' +result[i].MACH +'" class = "'+result[i].WRKC+'_wmid'+'">'+result[i].MACH+'</option>'
+	               )}  
+	           }       
+	} );
+	  var jsondatacal = {};
+	  jsondatacal.method = "add_cal";
+	  $.ajax({  
+	        type : 'POST',  
+	        contentType : 'application/x-www-form-urlencoded; charset=UTF-8',   
+	        url : 'cal_time',  
+	        data : jsondatacal,  
+	        dataType : 'html',  
+	        success : function(data) { 
+	    	   var result = JSON.parse(data);  
+	             
+	           $('#cal_selid option').remove();//移除先前数据  
+	           $('#cal_selid').append('<option value = "" selected></option>');
+	           for ( var i = 0; i < result.length; i++) {  
+	               $('#cal_selid').append(
+	               '<option value="' +result[i].CAL_CODE +'">'+result[i].CAL_CODE+'</option>'
+	               )}  
+	           }       
+	} );
+	  var jsondatat = {};
+	  jsondatat.method = "add_time";
+	  $.ajax({  
+	        type : 'POST',  
+	        contentType : 'application/x-www-form-urlencoded; charset=UTF-8',   
+	        url : 'cal_time',  
+	        data : jsondatat,  
+	        dataType : 'html',  
+	        success : function(data) { 
+	    	   var result = JSON.parse(data);  
+	             
+	           $('#time_selid option').remove();//移除先前数据  
+	           $('#time_selid').append('<option value = "" selected></option>');
+	           for ( var i = 0; i < result.length; i++) {  
+	               $('#time_selid').append(
+	               '<option value="' +result[i].WT_CODE +'">'+result[i].WT_CODE+'</option>'
+	               )}  
+	           }       
+	} );
 	  $('#calws_edit').modal('toggle');
+	  
 	}
   function edit_click(action,id,type,plant,wrkc,mach,cal_code,wt_code){
 	  wmethod = "edit";
 	  wid = id;
-	  document.getElementById("plantid").value = plant;
-	  document.getElementById("wrkcid").value = wrkc;
-	  document.getElementById("machid").value = mach;
-	  document.getElementById("calid").value = cal_code;
-	  document.getElementById("timeid").value = wt_code;
-	  document.getElementById("plantid").disabled = true;
-	  document.getElementById("wrkcid").disabled = true;
-	  document.getElementById("machid").disabled = true;
-	  document.getElementById("typeinput_textid").disabled = true;
 	  if(type == 'P'){
-		  document.getElementById("typeinput_textid").value = "P";
+		  document.getElementById("cal_time_title").innerHTML = "P--"+plant;
 	  }
 	  if(type == 'W'){
-		  document.getElementById("typeinput_textid").value = "W";
+		  document.getElementById("cal_time_title").innerHTML = "W--"+wrkc;
 	  }
 	  if(type == 'M'){
-		  document.getElementById("typeinput_textid").value = "M";
+		  document.getElementById("cal_time_title").innerHTML = "M--"+mach;
 	  }
-/*	  if(type == 'P'){
-		  document.getElementById("plantselid").setAttribute("selected","true");
-		  document.getElementById("wrkcselid").removeAttribute("selected");
-		  document.getElementById("machselid").removeAttribute("selected");
-	  }
-	  if(type == 'W'){
-		  document.getElementById("plantselid").removeAttribute("selected");
-		  document.getElementById("wrkcselid").setAttribute("selected","true");
-		  document.getElementById("machselid").removeAttribute("selected");
-	  }
-	  if(type == 'M'){
-		  document.getElementById("plantselid").removeAttribute("selected");
-		  document.getElementById("wrkcselid").removeAttribute("selected");
-		  document.getElementById("machselid").setAttribute("selected","true");
-	  }
-**/	  
+	  document.getElementById("type_divid").style.display = "none";
+	  document.getElementById("plant_divid").style.display = "none";
+	  document.getElementById("wrkc_divid").style.display = "none";
+	  document.getElementById("mach_divid").style.display = "none";
+	  var jsondatacal = {};
+	  jsondatacal.method = "add_cal";
+	  $.ajax({  
+	        type : 'POST',  
+	        contentType : 'application/x-www-form-urlencoded; charset=UTF-8',   
+	        url : 'cal_time',  
+	        data : jsondatacal,  
+	        dataType : 'html',  
+	        success : function(data) { 
+	    	   var result = JSON.parse(data);  
+	             
+	           $('#cal_selid option').remove();//移除先前数据  
+	           $('#cal_selid').append('<option value = "" selected></option>');
+	           for ( var i = 0; i < result.length; i++) {  
+	               $('#cal_selid').append(
+	               '<option value="' +result[i].CAL_CODE +'">'+result[i].CAL_CODE+'</option>'
+	               )}  
+	           }       
+	} );
+	  var jsondatat = {};
+	  jsondatat.method = "add_time";
+	  $.ajax({  
+	        type : 'POST',  
+	        contentType : 'application/x-www-form-urlencoded; charset=UTF-8',   
+	        url : 'cal_time',  
+	        data : jsondatat,  
+	        dataType : 'html',  
+	        success : function(data) { 
+	    	   var result = JSON.parse(data);  
+	             
+	           $('#time_selid option').remove();//移除先前数据  
+	           $('#time_selid').append('<option value = "" selected></option>');
+	           for ( var i = 0; i < result.length; i++) {  
+	               $('#time_selid').append(
+	               '<option value="' +result[i].WT_CODE +'">'+result[i].WT_CODE+'</option>'
+	               )}  
+	           }       
+	} );
 	  $('#calws_edit').modal('toggle');
   }
 function edit_calws() {  
@@ -618,11 +739,11 @@ function edit_calws() {
 	jsondata.method = wmethod;
 	jsondata.id = wid;
 	jsondata.wcal_type = document.getElementById("select_typeid").value;
-	jsondata.plant = document.getElementById("plantid").value;
-	jsondata.wrkc = document.getElementById("wrkcid").value;
-	jsondata.mach = document.getElementById("machid").value;
-	jsondata.cal_code = document.getElementById("calid").value;
-	jsondata.wt_code = document.getElementById("timeid").value;
+	jsondata.plant = document.getElementById("plant_selid").value;
+	jsondata.wrkc = document.getElementById("wrkc_selid").value;
+	jsondata.mach = document.getElementById("mach_selid").value;
+	jsondata.cal_code = document.getElementById("cal_selid").value;
+	jsondata.wt_code = document.getElementById("time_selid").value;
 	if(jsondata.cal_code == "" ||jsondata.cal_code == null){
 		alert("请正确输入日历代码");
 		return;
