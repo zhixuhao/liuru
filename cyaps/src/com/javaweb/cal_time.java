@@ -131,11 +131,18 @@ public class cal_time extends HttpServlet {
 		}
 		else if(method.equals("add_mach")){
 			try {
-				sql = "select mach,wrkc from dta_mach ";
+				sql = "select mach from dta_mach ";
 				ResultSet rs = datam.slect_sql(sql);
 				ResultSetMetaData metaData = rs.getMetaData();  
 				int columnCount = metaData.getColumnCount(); 
 				while (rs.next()) {
+					String mach = rs.getString(1);
+					sql = "select wrkc from dta_wrkc_mach where mach = '" +mach +"'";
+					ResultSet rs1 = datam.slect_sql(sql);
+					String wrkc_set = "";
+					while(rs1.next()){
+						wrkc_set = wrkc_set + rs1.getString(1)+"_wmid ";
+					}
 					JSONObject jsonObj = new JSONObject();
 					for (int i = 1; i <= columnCount; i++) {  
 			            String columnName =metaData.getColumnLabel(i); 
@@ -143,6 +150,7 @@ public class cal_time extends HttpServlet {
 			            String value = rs.getString(columnName);  
 			            jsonObj.put(columnName, value);  
 			        }
+					jsonObj.put("WRKC", wrkc_set);  
 			        array.add(jsonObj); 
 				}
 				System.out.println(array);

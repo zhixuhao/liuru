@@ -674,6 +674,11 @@ function delete_cstm(action,type,plant,wrkc,mach,cstm_date,starttime,endtime){
 	               )}  
 	           }       
 	} );
+	  document.getElementById("type_divid").style.display = "block";
+	  document.getElementById("plant_divid").style.display = "block";
+	  document.getElementById("wrkc_divid").style.display = "block";
+	  document.getElementById("mach_divid").style.display = "block";
+	  select_type();
 	  $('#calws_edit').modal('toggle');
 	  
 	}
@@ -751,6 +756,29 @@ function edit_calws() {
 	if(jsondata.wt_code == "" ||jsondata.wt_code == null){
 		alert("请正确输入时间代码");
 		return;
+	}
+	if(wmethod == "add"){
+		if(jsondata.plant == "" ||jsondata.plant == null){
+			alert("请正确输入plant");
+			return;
+		}
+		if(jsondata.wcal_type == "mach"){
+		if(jsondata.wrkc == "" ||jsondata.wrkc == null){
+			alert("请正确输入wrkc");
+			return;
+		}
+		if(jsondata.mach == "" ||jsondata.mach == null){
+			alert("请正确输入mach");
+			return;
+		}
+		}
+		if(jsondata.wcal_type == "wrkc"){
+			if(jsondata.wrkc == "" ||jsondata.wrkc == null){
+				alert("请正确输入wrkc");
+				return;
+			}
+			
+			}
 	}
 	$.ajax({  
         type : 'POST',  

@@ -37,10 +37,17 @@
 		font-size:40px;
 		}
 		.jishu{
-		background-color:#fcfcfc;
+		background-color:#e2efee;
+		margin-top:30px
 		}
 		.oushu{
-		
+		margin-top:30px
+		}
+		.wrapper{
+		background-color:#fff
+		}
+		.am-nav-tabs > li.am-active > a:hover,.am-nav-tabs > li.am-active > a{
+		background-color:#f3f3f3
 		}
 	</style>
 </head>
@@ -181,7 +188,7 @@
             <div class="col-sm-3" id = "main9" style="display:none">
               <div class="services">
                 <div class="service-item" >
-                  <span class="icon icon-1 icon-1c" onclick = "Scroll('menu9',150)"><i class="fa fa-search-plus"></i></span>
+                  <span class="icon icon-1 icon-1c" onclick = "Scroll('menu9',150)"><i class="fa fa-briefcase"></i></span>
                   <div class="service-desc">
                     <h4>分销需求计划</h4>
                     </div>
@@ -191,7 +198,7 @@
             <div class="col-sm-3" id = "main10" style="display:none">
               <div class="services">
                 <div class="service-item" >
-                  <span class="icon icon-1 icon-1c" onclick = "Scroll('menu10',150)"><i class="fa fa-search-plus"></i></span>
+                  <span class="icon icon-1 icon-1c" onclick = "Scroll('menu10',150)"><i class="fa fa-calendar"></i></span>
                   <div class="service-desc">
                     <h4>主生产计划</h4>
                     </div>
@@ -201,7 +208,7 @@
             <div class="col-sm-3" id = "main11" style="display:none">
               <div class="services">
                 <div class="service-item" >
-                  <span class="icon icon-1 icon-1c" onclick = "Scroll('menu11',150)"><i class="fa fa-search-plus"></i></span>
+                  <span class="icon icon-1 icon-1c" onclick = "Scroll('menu11',150)"><i class="fa fa-cubes"></i></span>
                   <div class="service-desc">
                     <h4>物料需求计划</h4>
                     </div>
@@ -211,7 +218,7 @@
             <div class="col-sm-3" id = "main12" style="display:none">
               <div class="services">
                 <div class="service-item" >
-                  <span class="icon icon-1 icon-1c" onclick = "Scroll('menu12',150)"><i class="fa fa-search-plus"></i></span>
+                  <span class="icon icon-1 icon-1c" onclick = "Scroll('menu12',150)"><i class="fa fa-line-chart"></i></span>
                   <div class="service-desc">
                     <h4>产能计划</h4>
                     </div>
@@ -221,7 +228,7 @@
             <div class="col-sm-3" id = "main13" style="display:none">
               <div class="services">
                 <div class="service-item" >
-                  <span class="icon icon-1 icon-1c" onclick = "Scroll('menu13',150)"><i class="fa fa-search-plus"></i></span>
+                  <span class="icon icon-1 icon-1c" onclick = "Scroll('menu13',150)"><i class="fa fa-group"></i></span>
                   <div class="service-desc">
                     <h4>客户服务管理</h4>
                     </div>
