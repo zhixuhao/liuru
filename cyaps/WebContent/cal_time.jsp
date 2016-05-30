@@ -272,11 +272,18 @@ $(function() {
 	  init();
 	  
 });
-
+function jsgetQueryString(name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+        return unescape(r[2]);
+    }
+    return null;
+}
 function init(){
 	  <%String app_url =  request.getQueryString();%>
 	  <%char menuid = app_url.charAt(app_url.length()-1);%>
-	  var menuid = '<%=menuid%>';
+	  var menuid = jsgetQueryString("menuid");
 	  var menuname = '<%=(String)session.getAttribute("menuarr")%>';
 	  menuname = menuname.trim();
 	  var menunamearr = menuname.split(" ");
@@ -320,7 +327,7 @@ function init(){
 		  var name = appnamearr[pos];
 		  var url = appurlarr[pos];
 		  $('#menudirul').append(
-				  "<li ><a href = \"#\" onclick=\"location='"+url+menuid+"'\">"+name+"  "+"</a></li>"
+				  "<li ><a href = \"#\" onclick=\"location='"+url+"&menuid="+menuid+"'\">"+name+"  "+"</a></li>"
 		  );
 	  }
 	  var myapp = '<%=(String)session.getAttribute("myapp")%>';
@@ -348,9 +355,10 @@ function init(){
 			  tmpappname = 'none';
 		  }
 		  $('#myfavoriteul').append(
-				  "<li ><a href = \"#\" onclick=\"location='"+tmpappurl+tmpm+"'\">"+tmpappname+"</a></li>"
+				  "<li ><a href = \"#\" onclick=\"location='"+tmpappurl+"&menuid="+tmpm+"'\">"+tmpappname+"</a></li>"
 		  );
 		}
+	  
 	  }
 function menuclick(id){
 	  var $l1 = $('#'+id);

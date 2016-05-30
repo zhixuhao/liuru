@@ -153,11 +153,19 @@ function iFrameTarget(target){
     init();
     
   });
+  function jsgetQueryString(name) {
+	    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+	    var r = window.location.search.substr(1).match(reg);
+	    if (r != null) {
+	        return unescape(r[2]);
+	    }
+	    return null;
+	}
   function init(){
 	  <%String app_url =  request.getQueryString();String url = app_url;%>
-	  var app_url = '<%=app_url.substring(0,app_url.length()-1)%>';
 	  <%char menuid = url.charAt(url.length()-1);%>
-	  var menuid = '<%=menuid%>';
+	  var app_url = jsgetQueryString("app_url");
+	  var menuid = jsgetQueryString("menuid");
 	  iFrameTarget(app_url);
 	  var menuname = '<%=(String)session.getAttribute("menuarr")%>';
 	  menuname = menuname.trim();

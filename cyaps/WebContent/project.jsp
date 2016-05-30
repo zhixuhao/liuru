@@ -49,6 +49,9 @@
 		.am-nav-tabs > li.am-active > a:hover,.am-nav-tabs > li.am-active > a{
 		background-color:#f3f3f3
 		}
+		.col-sm-2{
+			height:180px;
+		}
 	</style>
 </head>
 <body>
@@ -444,7 +447,7 @@
 		  //alert("app:"+appidarr[i]+"menu:"+m);
 		  var url = appurlarr[i];
 		  $('#menurow'+m).append(
-				  "<div class=\"col-sm-2\" ><div class=\"services\"><div class=\"service-item\"><button type = \"button\" class=\"btn btn-default btn-my\" onclick = \";javascript:window.open('"+url+m+"');\"><i class=\"fa fa-rocket icon-my\" ></i>"
+				  "<div class=\"col-sm-2\" ><div class=\"services\"><div class=\"service-item\"><button type = \"button\" class=\"btn btn-default btn-my\" onclick = \";javascript:window.open('"+url+"&menuid="+m+"');\"><i class=\"fa fa-rocket icon-my\" ></i>"
 	              + "</button> <div class=\"service-desc\"><h4>"+appnamearr[i]+"</h4></div></div></div> </div>"
 		  );
 	  }
