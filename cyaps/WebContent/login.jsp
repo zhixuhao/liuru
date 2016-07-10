@@ -18,21 +18,63 @@
 <style>
 .header {
 	text-align: center;
+	width:100%;
+	margin:auto;
 }
 
 .header h1 {
 	font-size: 200%;
 	color: #333;
 	margin-top: 30px;
+	margin-bottom:0px;
 }
 
 .header p {
 	font-size: 14px;
 }
+.header>div{
+	width:85%;
+}
+.footer{
+	text-align:center;
+	width:100%;
+	position:fixed;
+	bottom:1%;
+}
+.content{
+	width:30%;
+	margin:auto;
+	margin-top:50px;
+	background-color:white;
+	border-radius:5px;
+	padding:0px 20px 30px 30px;
+}
+#form{
+	width:100%;
+}
+#form_in{
+	width:100%;
+	padding:0px;
+}
+img{
+	width:80%;
+}
+hr{
+	margin-top:10px;
+	margin-bottom:10px;
+}
+body {
+	background-image:url("./manufacturing/eHeijunka2/images/back_img.png");
+	background-size:cover;
+	
+}
+.footer>small{
+	color:white;
+}
 </style>
 </head>
 <body>
-
+	<div class="content">
 	<div class="header">
 		<div class="am-g">
 			<h1>
@@ -41,8 +83,8 @@
 		</div>
 		<hr />
 	</div>
-	<div class="am-g">
-		<div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
+	<div class="am-g" id="form">
+		<div class="am-u-lg-6 am-u-md-8 am-u-sm-centered" id = "form_in">
 			<h3>用户登录</h3>
 			<hr>
 
@@ -63,11 +105,11 @@
 						onclick="location='<%=request.getContextPath()%>/register.jsp'"> -->
 				</div>
 			</form>
-			<hr>
-			<div class="footer">
-				<small>Copyright © 2015-2016 Liuru Tech. All Rights Reserved  六如科技 版权所有</small>
-			</div>
 		</div>
+	</div>
+	</div>
+	<div class="footer">
+				<small>Copyright © 2015-2016 Liuru Tech. All Rights Reserved  六如科技 版权所有</small>
 	</div>
 	<div class="am-modal am-modal-alert" tabindex="-1" id="err">
 		<div class="am-modal-dialog">
